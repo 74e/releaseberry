@@ -1,26 +1,26 @@
 <template>
   <div class="toolbar">
-    <div class="list-button-container">
-      <WindowMenu>
+    <div class="list-btn-container">
+      <WindowPopup position="bottom-right">
         <ListIcon />
 
         <template #window> testing text for window </template>
-      </WindowMenu>
+      </WindowPopup>
     </div>
 
-    <div class="menu-buttons">
+    <div class="menu-btns">
       <Transition name="fade" mode="out-in">
         <component @click="toggleSearchField" :is="searchIcon" />
       </Transition>
       <!-- <FilterIcon /> TODO ADD FILTER FUNCTION -->
-      <WindowMenu>
+      <WindowPopup position="left-center">
         <ThemeIcon />
         <template #window> testing text for window </template>
-      </WindowMenu>
+      </WindowPopup>
 
       <LayoutIcon />
 
-      <button class="add-title-button">
+      <button class="add-title-btn">
         <PlusIcon />
         Add
       </button>
@@ -35,9 +35,9 @@
 </template>
 
 <script>
-import useColorStore from '../state/accentColor.js'
+import colorStore from '../state/accentColor.js'
 import SearchField from './SearchField.vue'
-import WindowMenu from './WindowMenu.vue'
+import WindowPopup from './WindowPopup.vue'
 import { mapState } from 'pinia'
 
 export default {
@@ -45,7 +45,7 @@ export default {
 
   components: {
     SearchField,
-    WindowMenu
+    WindowPopup
   },
 
   data() {
@@ -55,7 +55,7 @@ export default {
   },
 
   computed: {
-    ...mapState(useColorStore, [
+    ...mapState(colorStore, [
       'accentColor',
       'backgroundColor',
       'backgroundPosition',
@@ -96,18 +96,18 @@ export default {
   justify-content: space-between;
   position: relative;
 
-  .list-button-container {
+  .list-btn-container {
     display: flex;
     align-items: center;
   }
 
-  .menu-buttons {
+  .menu-btns {
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 18px;
 
-    .add-title-button {
+    .add-title-btn {
       display: flex;
       align-items: center;
       padding: 3px 8px 3px 4px;
@@ -115,9 +115,8 @@ export default {
 
       background-color: transparent;
       color: v-bind(accentColor);
-      border: 2px solid v-bind(accentColor);
+      border: 2px solid v-bind(accentColor + 'c7');
       border-radius: 4px;
-
       svg {
         margin-right: 4px;
       }
@@ -135,10 +134,10 @@ export default {
   @media (max-width: 350px) {
     height: 44px;
 
-    .menu-buttons {
+    .menu-btns {
       gap: 12px;
 
-      .add-title-button {
+      .add-title-btn {
         font-size: 14px;
         padding: 2px 6px 3px 4px;
         border-width: 1px;
@@ -155,9 +154,10 @@ export default {
   }
 }
 
-.add-title-button {
+.add-title-btn {
   cursor: pointer;
   transition: all v-bind(duration + 's') ease-out;
+
   &:hover {
     filter: var(--hover-filter-effect);
   }

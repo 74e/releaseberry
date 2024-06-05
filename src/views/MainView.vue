@@ -29,13 +29,11 @@ export default {
     return {}
   },
 
-  mounted() {},
-
   methods: {}
 }
 </script>
 
-<style>
+<style scoped>
 .card-display-container {
   display: flex;
   align-items: center;

@@ -26,7 +26,7 @@ import {
   releaseBerryMinimalPresets,
   releaseBerryMinimalSettings
 } from '../../assets/styleSettings/defaultPresetsAndSettings.js'
-import useColorStore from '@/state/accentColor'
+import colorStore from '@/state/accentColor'
 import { mapActions } from 'pinia'
 
 export default {
@@ -91,7 +91,7 @@ export default {
   },
 
   methods: {
-    ...mapActions(useColorStore, ['setDefaultColor', 'setNewColor']),
+    ...mapActions(colorStore, ['setDefaultColor', 'setNewColor']),
 
     stringifyRGBA(colorValues) {
       const { R, G, B, A } = colorValues

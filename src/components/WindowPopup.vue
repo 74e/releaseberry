@@ -17,11 +17,11 @@
 </template>
 
 <script>
-import useColorStore from '../state/accentColor.js'
+import colorStore from '../state/accentColor.js'
 import { mapState } from 'pinia'
 
 export default {
-  name: 'WindowComponent',
+  name: 'WindowPopupComponent',
 
   props: {
     width: {
@@ -34,12 +34,20 @@ export default {
       default: 2
     },
 
+    borderRadius: {
+      type: String,
+      default: 'm',
+      validator(value) {
+        return ['s', 'm', 'l'].includes(value)
+      }
+    },
+
     accentBorders: {
       type: [Array],
       default: () => ['top'],
       validator(value) {
         return value.every((border) =>
-          ['top', 'bottom', 'right', 'left'].includes(border)
+          ['top', 'bottom', 'right', 'left', 'none'].includes(border)
         )
       }
     },
@@ -86,6 +94,11 @@ export default {
     showDelay: {
       type: Number,
       default: 0
+    },
+
+    animaSpeed: {
+      type: Number,
+      default: 0.25
     }
   },
 
@@ -98,7 +111,7 @@ export default {
   },
 
   computed: {
-    ...mapState(useColorStore, ['accentColor', 'duration']),
+    ...mapState(colorStore, ['accentColor', 'duration']),
 
     windowPosition() {
       let [primary, secondary] = this.position.split('-')
@@ -114,9 +127,15 @@ export default {
     },
 
     borderStyle() {
+      if (this.accentBorders.includes('none')) return ''
+
       return this.accentBorders.reduce((border, selectedBorder) => {
         return (border += `border-${selectedBorder}: ${this.borderWidth}px solid ${this.accentColor};`)
       }, '')
+    },
+
+    borderRadiusSize() {
+      return `var(--radius-${this.borderRadius})`
     }
   },
 
@@ -216,7 +235,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 .anchor {
   position: relative;
 }
@@ -225,16 +244,13 @@ export default {
   width: v-bind(width);
   background-color: var(--dark-50);
   box-shadow: var(--shadow-default);
-  border-radius: var(--radius-l);
+  border-radius: v-bind(borderRadiusSize);
   transition: all v-bind(duration) ease-out;
   backdrop-filter: blur(80px);
 
   @supports (backdrop-filter: blur(80px)) {
     background-color: var(--dark-95);
   }
-
-  padding: 16px;
-  height: 300px;
 
   position: absolute;
   z-index: 1000;
@@ -247,6 +263,6 @@ export default {
 
 .fade-enter-active,
 .fade-leave-active {
-  transition: all 0.25s ease-out;
+  transition: all v-bind(animaSpeed + 's') ease-out;
 }
 </style>

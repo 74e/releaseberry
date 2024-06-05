@@ -25,6 +25,10 @@ import ThemeIcon from './ThemeIcon.vue'
 import TinyArrowIcon from './TinyArrowIcon.vue'
 import SettingsIcon from './SettingsIcon.vue'
 import CloseIcon from './CloseIcon.vue'
+import LoginIcon from './LoginIcon.vue'
+import LogoutIcon from './LogoutIcon.vue'
+import NoticeIcon from './NoticeIcon.vue'
+import LoadingAnimIcon from './LoadingAnimIcon.vue'
 
 export default {
   AchievementIcon,
@@ -53,5 +57,9 @@ export default {
   ThemeIcon,
   TinyArrowIcon,
   SettingsIcon,
-  CloseIcon
+  CloseIcon,
+  LoginIcon,
+  LogoutIcon,
+  NoticeIcon,
+  LoadingAnimIcon
 }

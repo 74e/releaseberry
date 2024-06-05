@@ -2,7 +2,6 @@ import { createRouter, createWebHistory } from 'vue-router'
 import Main from '../views/MainView.vue'
 import Profile from '../views/ProfileView.vue'
 import Notes from '../views/NotesView.vue'
-import Calendar from '../views/CalendarView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -13,7 +12,7 @@ const router = createRouter({
       component: Main
     },
     {
-      path: '/user/:id',
+      path: '/user/:username?',
       name: 'profile',
       component: Profile
     },
@@ -21,11 +20,6 @@ const router = createRouter({
       path: '/notes',
       name: 'notes',
       component: Notes
-    },
-    {
-      path: '/calendar',
-      name: 'calendar',
-      component: Calendar
     }
   ]
 })

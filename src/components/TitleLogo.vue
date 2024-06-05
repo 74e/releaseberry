@@ -6,7 +6,7 @@
 </template>
 
 <script>
-import useColorStore from '../state/accentColor.js'
+import colorStore from '../state/accentColor.js'
 import { mapState } from 'pinia'
 
 export default {
@@ -17,7 +17,7 @@ export default {
   },
 
   computed: {
-    ...mapState(useColorStore, [
+    ...mapState(colorStore, [
       'accentColor',
       'backgroundColor',
       'backgroundPosition',

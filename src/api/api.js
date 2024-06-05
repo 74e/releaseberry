@@ -7,10 +7,11 @@ export const api = axios.create({
 })
 
 api.interceptors.request.use((request) => {
-  const session = localStorage.getItem('session')
-  const token = session && JSON.parse(session).token
-
-  if (token) request.headers.common['Authorization'] = `Bearer ${token}`
+  const session = localStorage.getItem('RBsession')
+  if (session) {
+    const { token } = JSON.parse(session)
+    request.headers['Authorization'] = `Bearer ${token}`
+  }
 
   return request
 })
@@ -20,7 +21,6 @@ api.interceptors.response.use(
     return response
   },
   (error) => {
-    console.log(error?.response)
     return Promise.reject(error)
   }
 )

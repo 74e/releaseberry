@@ -6,7 +6,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 .temp {
   font-size: 50px;
   font-family: var(--font-family-mplus);

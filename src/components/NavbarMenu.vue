@@ -1,75 +1,115 @@
 <template>
   <nav>
     <ul>
-      <li
-        v-for="(menuItem, index) in menuItems"
-        @click="handleClick(index, menuItem)"
-        :class="{ active: menuItems[currentIndex].component === menuItem.component }"
-        :key="menuItem.component"
-      >
-        <component :is="menuItem.component" />
-        <span v-if="menuItem.name">{{ menuItem.name }}</span>
+      <li>
+        <RouterLink to="/">
+          <ReleaseBerryIcon />
+          <span>Notes</span>
+        </RouterLink>
       </li>
+
+      <li>
+        <RouterLink :to="`/user/${this.username || ''}`">
+          <ProfileIcon />
+          <span>Profile</span>
+        </RouterLink>
+      </li>
+
+      <li>
+        <RouterLink to="/notes">
+          <NotesIcon />
+          <span>Notes</span>
+        </RouterLink>
+      </li>
+
+      <li @click="openUserSearchModal">
+        <SearchIcon />
+      </li>
+
+      <SettingsMenu @openModal="openAuthModal">
+        <li>
+          <DotMenuIcon />
+        </li>
+      </SettingsMenu>
     </ul>
 
     <div class="active-link-indicator" />
   </nav>
+  <AuthModal v-model:showModal="showAuthModal" />
+  <UserSearchModal ref="UserSearchModal" v-model:showModal="showUserSearchModal" />
 </template>
 
 <script>
-import useColorStore from '@/state/accentColor'
-import useUserStore from '@/state/user'
+import colorStore from '@/state/accentColor'
+import userStore from '@/state/userStore'
+import SettingsMenu from './SettingsMenu.vue'
 import { mapState } from 'pinia'
+import AuthModal from './AuthModal.vue'
+import UserSearchModal from './UserSearchModal.vue'
 
 export default {
   name: 'NavbarMenuComponent',
 
+  components: {
+    SettingsMenu,
+    AuthModal,
+    UserSearchModal
+  },
+
   data() {
     return {
-      menuItems: [
-        { name: 'Home', path: '/', component: 'ReleaseBerryIcon' },
-        { name: 'Profile', path: `/user`, component: 'ProfileIcon' },
-        { name: 'Notes', path: '/notes', component: 'NotesIcon' },
-        { name: 'Calendar', path: '/calendar', component: 'CalendarIcon' },
-        { component: 'DotMenuIcon' }
-      ],
+      navItems: [{ pathName: 'main' }, { pathName: 'profile' }, { pathName: 'notes' }],
+      renderedNavItems: null,
       currentIndex: 0,
-      indicatorOffset: null
+      indicatorOffset: null,
+      showAuthModal: false,
+      showUserSearchModal: false
+    }
+  },
+
+  watch: {
+    $route: {
+      handler(updatedRoute) {
+        this.currentIndex = this.navItems.findIndex((item) => {
+          return item.pathName === updatedRoute.name
+        })
+
+        this.setActiveLinkIndicator(this.currentIndex)
+      },
+      deep: true
     }
   },
 
   computed: {
-    ...mapState(useColorStore, ['accentColor']),
-    ...mapState(useUserStore, ['userName'])
-  },
+    ...mapState(colorStore, ['accentColor']),
+    ...mapState(userStore, ['username']),
 
-  mounted() {
-    this.setActiveLinkIndicator()
+    RenderedmavItems() {
+      return this.navItems.map((item) => {
+        if (item.pathName === 'profile' && this.username) {
+          item.path += `/${this.username}`
+        }
+        return item
+      })
+    }
   },
 
   methods: {
-    handleClick(index, menuItem) {
-      this.setActiveLinkIndicator(index)
-      this.menuAction(menuItem)
-    },
-
-    menuAction(menuItem) {
-      if (menuItem.path) {
-        let link = menuItem.path
-        if (menuItem.path === '/user') link += `/${this.userName}`
-
-        this.$router.push(link)
-        return
-      }
-    },
-
     setActiveLinkIndicator(index = 0) {
       this.currentIndex = index
-      if (index > 3) return
       // --------------------  BAD SOLUTION  -----------------------------------------
       const startingOffset = 35
-      const percentOffset = 17.6
-      this.indicatorOffset = `${index * percentOffset}% + ${startingOffset}px`
+      const distanceToNextItem = 17.6
+      this.indicatorOffset = `${index * distanceToNextItem}% + ${startingOffset}px`
+    },
+
+    openAuthModal() {
+      this.showAuthModal = true
+    },
+
+    openUserSearchModal() {
+      this.showUserSearchModal = true
+      this.$refs.UserSearchModal.focusSearch()
     }
   }
 }
@@ -140,6 +180,7 @@ nav {
     left: 50%;
     bottom: 16px;
     transform: translateX(-50%);
+    border-radius: var(--radius-m) !important;
   }
 
   @media (max-width: 336px) {
@@ -176,7 +217,11 @@ span {
   display: none;
 }
 
-.active {
+a {
+  transition: all 0.3s ease-out;
+}
+
+.router-link-active {
   filter: var(--hover-filter-effect);
 }
 

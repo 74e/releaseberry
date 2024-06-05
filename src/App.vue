@@ -1,7 +1,7 @@
 <template>
   <router-view v-slot="{ Component }">
     <transition name="fade" mode="out-in">
-      <component :is="Component" />
+      <component v-if="authInitiated" :is="Component" />
     </transition>
   </router-view>
   <NavbarMenu />
@@ -9,8 +9,9 @@
 </template>
 
 <script>
-import useColorStore from './state/accentColor'
-import { mapState } from 'pinia'
+import colorStore from './state/accentColor'
+import userStore from './state/userStore'
+import { mapState, mapActions } from 'pinia'
 import { RouterView } from 'vue-router'
 import NavbarMenu from './components/NavbarMenu.vue'
 
@@ -20,8 +21,46 @@ export default {
     NavbarMenu
   },
 
+  created() {
+    this.initiateApp()
+  },
+
+  data() {
+    return {
+      authInitiated: false
+    }
+  },
+
   computed: {
-    ...mapState(useColorStore, ['accentColor', 'duration'])
+    ...mapState(colorStore, ['accentColor', 'duration'])
+  },
+
+  methods: {
+    ...mapActions(userStore, ['persistentLogin', 'logout']),
+
+    /**
+     * Most of the app is relient on if the userStore has fetched
+     * the currents users data. Setting this function to async
+     * and letting it dictate when/if the app is initiated makes sure that
+     * no matter how slow the connection is the result of any other
+     * logic relient on the user will be determenistic. I'll still handle
+     * each case as if it could be undefined, but this way I can be sure
+     *
+     * TODO: Add fancy loading screen animation
+     */
+    async initiateApp() {
+      const session = localStorage.getItem('RBsession')
+      if (session) {
+        try {
+          await this.persistentLogin()
+        } catch (error) {
+          console.error(error)
+          this.logout()
+        }
+      }
+
+      this.authInitiated = true
+    }
   }
 }
 </script>

@@ -6,7 +6,7 @@ const transitionedPosition = 'right'
 const initialDuration = 0.3
 const extendedDuration = 1.5
 
-const useColorStore = defineStore('accentColor', {
+const colorStore = defineStore('accentColor', {
   state: () => ({
     color: initialColor,
     bgColor: initialColor,
@@ -46,4 +46,4 @@ const useColorStore = defineStore('accentColor', {
   }
 })
 
-export default useColorStore
+export default colorStore
