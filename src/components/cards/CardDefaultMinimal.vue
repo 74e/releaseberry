@@ -6,41 +6,45 @@
     ]"
   >
     <div class="image-container">
-      <img
-        src="https://cdn2.steamgriddb.com/thumb/a32edb2c3f38d8174379d8190caba316.jpg"
-        alt="trials of mana"
-      />
+      <img :src="gameData.cover_url" :alt="cardTitle" />
     </div>
 
     <div class="info-container">
-      <span v-if="showTitle" class="card-title"> Trials of Mana </span>
+      <span v-if="showTitle" class="card-title"> {{ cardTitle }} </span>
       <div class="timer-container">
-        <span class="timer"> 24 : 13 : 23 </span>
+        <timerDisplay class="timer" :releaseDate="releaseDate" />
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import {
-  releaseBerryMinimalPresets,
-  releaseBerryMinimalSettings
-} from '../../assets/styleSettings/defaultPresetsAndSettings.js'
+import { releaseBerryMinimal } from '../../assets/styleSettings/defaultPresetsAndSettings.js'
 import colorStore from '@/state/accentColor'
 import { mapActions } from 'pinia'
+import timerDisplay from '@/components/TimerDisplay.vue'
 
 export default {
   name: 'CardDefaultMinimalComponent',
 
+  components: {
+    timerDisplay
+  },
+
   props: {
+    gameData: {
+      type: Object,
+      default: () => ({})
+    },
+
     styleSettings: {
       type: Object,
-      default: releaseBerryMinimalPresets[0]
+      default: releaseBerryMinimal.presets[0]
     },
 
     displaySettings: {
       type: Object,
-      default: releaseBerryMinimalSettings
+      default: releaseBerryMinimal.settings
     }
   },
 
@@ -83,6 +87,14 @@ export default {
     fakeDepthWidth() {
       const width = this.styleSettings.fakeDepth.width
       return `${width}px`
+    },
+
+    cardTitle() {
+      return this.gameData.name
+    },
+
+    releaseDate() {
+      return Number(this.gameData.release_date)
     }
   },
 

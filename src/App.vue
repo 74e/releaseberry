@@ -5,7 +5,8 @@
     </transition>
   </router-view>
   <NavbarMenu />
-  <div class="fakeBG" />
+
+  <div class="temporaryBG" />
 </template>
 
 <script>
@@ -93,7 +94,7 @@ svg {
   }
 }
 
-.fakeBG {
+.temporaryBG {
   position: fixed;
   inset: 0;
   background-image: url('/fakeEffect.png');

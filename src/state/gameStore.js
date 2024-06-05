@@ -1,16 +1,15 @@
 import { defineStore } from 'pinia'
-import gameService from '@/api/userService'
+import gameService from '@/api/gameService'
 
-const userStore = defineStore('User', {
+const gameStore = defineStore('Game', {
   state: () => ({
     ownGames: null,
     globalGames: null
   }),
 
   getters: {
-    ownLibrary: (state) => state.ownLibrary,
-    globalLibrary: (state) => state.globalLibrary,
-    currentProfileLibrary: (state) => state.profileGames
+    library: (state) => state.ownGames,
+    globalLibrary: (state) => state.globalLibrary
   },
 
   actions: {
@@ -23,7 +22,7 @@ const userStore = defineStore('User', {
       }
     },
 
-    async getUserProfile() {
+    async getGlobalGames() {
       try {
         const { data } = await gameService.getGlobalGames()
         this.globalGames = data
@@ -34,4 +33,4 @@ const userStore = defineStore('User', {
   }
 })
 
-export default userStore
+export default gameStore
