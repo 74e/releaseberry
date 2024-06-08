@@ -81,7 +81,7 @@ export default {
 
         this.handleSuccesfulLogin()
       } catch (error) {
-        this.error = error.response.data.error // Add custom error message from backend
+        this.error = error.response.data.error // Adds custom error message from backend
 
         setTimeout(() => {
           this.error = ''

@@ -27,10 +27,11 @@
     <div class="note-field">
       <textarea
         @keyup="currentLnAndRowPosition"
+        @input="updateNoteContent"
         @mouseup="getSelectedContent"
         ref="noteArea"
         class="note-area"
-        v-model="noteWindow.noteContent"
+        :value="noteContent"
         spellcheck="false"
       ></textarea>
     </div>
@@ -59,6 +60,11 @@ export default {
     noteWindow: {
       type: [Object, null],
       default: null
+    },
+
+    noteContent: {
+      type: String,
+      default: ''
     }
   },
 
@@ -92,6 +98,10 @@ export default {
   },
 
   methods: {
+    updateNoteContent(event) {
+      console.log(event.target.value)
+      this.$emit('update:noteContent', event.target.value)
+    },
     /*
      * When moving the mouse too fast it can cause the mousemove event to "slip off"
      * as the window doesnt keep up with the mouse movement 1:1
@@ -105,7 +115,7 @@ export default {
     currentLnAndRowPosition() {
       const cursorPosition = this.$refs.noteArea.selectionStart
       // substr cuts the string at cursor position before spliting into rows
-      const lines = this.noteWindow.noteContent.substring(0, cursorPosition).split('\n')
+      const lines = this.noteContent.substring(0, cursorPosition).split('\n')
 
       this.ln = lines.length
       this.col = lines[lines.length - 1] ? lines[lines.length - 1].length + 1 : 1
@@ -173,7 +183,7 @@ export default {
   box-shadow: var(--box-shadow-close);
   width: 800px;
   height: 400px;
-  border-radius: var(--border-radius);
+  border-radius: var(--radius-m);
   color: var(--font-color-white);
   min-height: 340px;
   min-width: 470px;

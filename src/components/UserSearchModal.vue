@@ -21,7 +21,11 @@
       <div class="results-container">
         <div class="results" v-if="results.length > 0">
           <TransitionGroup name="fade" tag="div">
-            <UserSearchItem v-for="result in results" :key="result.id" :item="result" />
+            <UserSearchItem
+              v-for="result in sortedResults"
+              :key="result.id"
+              :item="result"
+            />
           </TransitionGroup>
         </div>
       </div>
@@ -52,7 +56,11 @@ export default {
   },
 
   computed: {
-    ...mapState(colorStore, ['accentColor'])
+    ...mapState(colorStore, ['accentColor']),
+
+    sortedResults() {
+      return this.results.toSorted((a, b) => a.username.length - b.username.length)
+    }
   },
 
   methods: {

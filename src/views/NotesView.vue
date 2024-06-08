@@ -1,29 +1,29 @@
 <template>
   <!-- add to main later @contextmenu="(event) => handleContextMenu(event)"-->
-
-  <div class="notepad-bg">
-    <div class="bg-blur" />
-  </div>
-
-  <main>
-    <NotepadWindow
-      v-for="noteWindow in windows"
-      :noteWindow="noteWindow"
-      :key="noteWindow"
-    />
-    <div class="text-menu">
-      <button @click="createNewWindow" class="add">
-        <IconPlus class="add-icon" />
-      </button>
-      <button @click="console.log(windows)" class="add">
-        <IconPlus class="add-icon" />
-      </button>
-      <div class="notes">
-        <!-- // render out indiviual notes
-        // TODO: use vuex/pinja for state management -->
-      </div>
+  <div class="root-node">
+    <div class="notepad-bg">
+      <div class="bg-blur" />
     </div>
-  </main>
+
+    <main>
+      <NotepadWindow
+        v-for="noteWindow in windows"
+        :noteWindow="noteWindow"
+        v-model:noteContent="noteWindow.noteContent"
+        :key="noteWindow.id"
+      />
+      <div class="text-menu">
+        <button @click="createNewWindow" class="add">
+          <PlusIcon class="add-icon" />
+        </button>
+
+        <div class="notes">
+          <!-- // render out indiviual notes
+        // TODO: use vuex/pinia for state management -->
+        </div>
+      </div>
+    </main>
+  </div>
 </template>
 
 <script>
