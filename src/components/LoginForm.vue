@@ -13,8 +13,13 @@
 
         <form @submit.prevent="handleSubmit">
           <div class="input-container">
-            <label for="email">Email</label>
-            <input type="email" id="email" v-model="email" required />
+            <label for="userHandleOrEmail">User handle or Email</label>
+            <input
+              type="userHandleOrEmail"
+              id="userHandleOrEmail"
+              v-model="userHandleOrEmail"
+              required
+            />
           </div>
 
           <div class="input-container">
@@ -43,15 +48,16 @@
 
 <script>
 import userStore from '../state/userStore.js'
-import colorStore from '../state/accentColor.js'
 import { mapActions, mapState } from 'pinia'
 
 export default {
   name: 'AuthModalComponent',
 
+  inject: ['hide', 'accentColor'],
+
   data() {
     return {
-      email: '',
+      userHandleOrEmail: '',
       password: '',
       error: '',
       isLoading: false,
@@ -59,10 +65,7 @@ export default {
     }
   },
 
-  inject: ['hide'],
-
   computed: {
-    ...mapState(colorStore, ['accentColor']),
     ...mapState(userStore, ['username'])
   },
 
@@ -77,11 +80,15 @@ export default {
       this.isLoading = true
 
       try {
-        await this.login({ email: this.email, password: this.password })
+        await this.login({
+          userHandleOrEmail: this.userHandleOrEmail,
+          password: this.password
+        })
 
         this.handleSuccesfulLogin()
       } catch (error) {
-        this.error = error.response.data.error // Adds custom error message from backend
+        // Adds custom error message from backend
+        this.error = error.response.data.error
 
         setTimeout(() => {
           this.error = ''

@@ -20,7 +20,7 @@
 
       <LayoutIcon />
 
-      <button class="add-title-btn">
+      <button @click="toggleAddGameModal" class="add-title-btn">
         <PlusIcon />
         Add
       </button>
@@ -32,36 +32,33 @@
     @search="search"
     @toggle-search-field="toggleSearchField"
   />
+  <AddGameModal v-model:showModal="showAddGameModal" />
 </template>
 
 <script>
-import colorStore from '../state/accentColor.js'
 import SearchField from './SearchField.vue'
-import WindowPopup from './WindowPopup.vue'
-import { mapState } from 'pinia'
+import WindowPopup from './uiComponents/WindowPopup.vue'
+import AddGameModal from './AddGameModal.vue'
 
 export default {
   name: 'CardToolbarComponent',
 
   components: {
     SearchField,
-    WindowPopup
+    WindowPopup,
+    AddGameModal
   },
+
+  inject: ['accentColor', 'backgroundColor', 'backgroundPosition', 'duration'],
 
   data() {
     return {
-      showSearchField: false
+      showSearchField: false,
+      showAddGameModal: false
     }
   },
 
   computed: {
-    ...mapState(colorStore, [
-      'accentColor',
-      'backgroundColor',
-      'backgroundPosition',
-      'duration'
-    ]),
-
     searchIcon() {
       return this.showSearchField ? 'CloseIcon' : 'SearchIcon'
     }
@@ -70,6 +67,10 @@ export default {
   methods: {
     toggleSearchField() {
       this.showSearchField = !this.showSearchField
+    },
+
+    toggleAddGameModal() {
+      this.showAddGameModal = !this.showAddGameModal
     },
 
     search(query) {

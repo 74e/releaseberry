@@ -6,7 +6,7 @@
 
     <div class="profile-details">
       <div class="profile-handle">
-        <h2 class="hangle">{{ username }}</h2>
+        <h2 class="handle">{{ username }}</h2>
         <span class="id-handle">@{{ username }}</span>
       </div>
 
@@ -52,13 +52,14 @@
 </template>
 
 <script>
-import colorStore from '@/state/accentColor'
 import userStore from '@/state/userStore'
 import { mapState } from 'pinia'
 import temporaryAvatars from '@/assets/temporaryAvatars'
 
 export default {
   name: 'ProfileView',
+
+  inject: ['accentColor'],
 
   props: {
     userData: {
@@ -76,7 +77,6 @@ export default {
   mounted() {},
 
   computed: {
-    ...mapState(colorStore, ['accentColor']),
     ...mapState(userStore, [
       'loggedInUser',
       'followUser',
@@ -199,6 +199,7 @@ export default {
     padding-left: 12px;
     position: relative;
     overflow: hidden;
+    line-height: 19px;
 
     width: 100%;
 

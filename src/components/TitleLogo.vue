@@ -6,26 +6,10 @@
 </template>
 
 <script>
-import colorStore from '../state/accentColor.js'
-import { mapState } from 'pinia'
-
 export default {
   name: 'TitleLogoComponent',
 
-  data() {
-    return {}
-  },
-
-  computed: {
-    ...mapState(colorStore, [
-      'accentColor',
-      'backgroundColor',
-      'backgroundPosition',
-      'duration'
-    ])
-  },
-
-  methods: {}
+  inject: ['accentColor', 'backgroundColor', 'backgroundPosition', 'duration']
 }
 </script>
 

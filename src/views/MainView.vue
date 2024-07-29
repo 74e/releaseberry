@@ -2,14 +2,13 @@
   <main>
     <TitleLogo />
     <CardToolbar />
-    <div v-if="modifiedCardData" class="card-display-container">
+    <div class="card-display-container">
       <component
-        :is="card.component"
-        v-for="card in modifiedCardData"
+        v-for="card in library"
+        :is="card.cardData.card_component"
         :gameData="card.gameData"
-        :styleSettings="card.styleSettings"
-        :displaySettings="card.displaySettings"
-        :key="card"
+        :cardData="card.cardData"
+        :key="card.id"
       />
     </div>
   </main>
@@ -21,19 +20,13 @@ import TitleLogo from '@/components/TitleLogo.vue'
 import gameStore from '@/state/gameStore'
 import userStore from '@/state/userStore'
 import { mapState, mapActions } from 'pinia'
-import {
-  releaseBerryStandard,
-  releaseBerryMinimal
-} from '@/assets/styleSettings/defaultPresetsAndSettings.js'
-import TimerDisplay from '@/components/TimerDisplay.vue'
 
 export default {
   name: 'MainView',
 
   components: {
     CardToolbar,
-    TitleLogo,
-    TimerDisplay
+    TitleLogo
   },
 
   data() {
@@ -42,55 +35,20 @@ export default {
 
   mounted() {
     this.initialize()
-
-    setTimeout(() => {
-      console.log(this.modifiedCardData)
-    }, 2000)
   },
 
   computed: {
     ...mapState(gameStore, ['library']),
-    ...mapState(userStore, ['loggedInUser']),
-
-    card() {
-      return this.modifiedCardData
-    },
-
-    // Make shift to simulate kind of what the backend will return when its finished
-    modifiedCardData() {
-      return this.library?.map((game) => {
-        const randomStyle = Math.floor(
-          Math.random() * releaseBerryStandard.presets.length
-        )
-        const cards = [
-          {
-            component: 'CardDefault',
-            styleSettings: releaseBerryStandard.presets[randomStyle],
-            displaySettings: releaseBerryStandard.settings
-          },
-          {
-            component: 'CardDefaultMinimal',
-            styleSettings: releaseBerryMinimal.presets[randomStyle],
-            displaySettings: releaseBerryMinimal.settings
-          }
-        ]
-        const randomCard = Math.floor(Math.random() * cards.length)
-
-        return {
-          gameData: {
-            ...game
-          },
-          ...cards[randomCard]
-        }
-      })
-    }
+    ...mapState(userStore, ['loggedInUser'])
   },
 
   methods: {
     ...mapActions(gameStore, ['getLibrary']),
 
     async initialize() {
-      this.getLibrary(this.loggedInUser.id)
+      await this.getLibrary(this.loggedInUser.id)
+
+      console.log(this.library)
     }
   }
 }

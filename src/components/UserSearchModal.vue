@@ -34,10 +34,9 @@
 </template>
 
 <script>
-import ModalPopup from './ModalPopup.vue'
-import colorStore from '@/state/accentColor'
+import ModalPopup from './uiComponents/ModalPopup.vue'
 import userStore from '@/state/userStore'
-import { mapState, mapActions } from 'pinia'
+import { mapActions } from 'pinia'
 import UserSearchItem from './UserSearchItem.vue'
 
 export default {
@@ -48,16 +47,17 @@ export default {
     UserSearchItem
   },
 
+  inject: ['accentColor'],
+
   data() {
     return {
       searchValue: '',
-      results: []
+      results: [],
+      searcbTimeout: null
     }
   },
 
   computed: {
-    ...mapState(colorStore, ['accentColor']),
-
     sortedResults() {
       return this.results.toSorted((a, b) => a.username.length - b.username.length)
     }

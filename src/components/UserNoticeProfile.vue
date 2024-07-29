@@ -15,14 +15,10 @@
 </template>
 
 <script>
-import colorStore from '@/state/accentColor'
-import { mapState } from 'pinia'
 export default {
   name: 'UserNoticeProfileComponent',
 
-  computed: {
-    ...mapState(colorStore, ['accentColor'])
-  }
+  inject: ['accentColor']
 }
 </script>
 

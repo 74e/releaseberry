@@ -1,4 +1,4 @@
-import CardDefaultMinimal from './CardDefaultMinimal.vue'
-import CardDefault from './CardDefault.vue'
+import ReleaseBerryMinimalCard from './ReleaseBerryMinimalCard.vue'
+import ReleaseBerryDefaultCard from './ReleaseBerryDefaultCard.vue'
 
-export default { CardDefaultMinimal, CardDefault }
+export default { ReleaseBerryMinimalCard, ReleaseBerryDefaultCard }

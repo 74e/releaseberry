@@ -26,9 +26,9 @@
               <span class="title">{{ item.game.name }}</span>
 
               <span class="release-label">Release date</span>
-              <span class="release-date">{{
-                convertToDate(item.game.release_date)
-              }}</span>
+              <span class="release-date">
+                {{ convertToDate(item.game.release_date) }}
+              </span>
 
               <div class="options-container">
                 <button>Details</button>
@@ -49,7 +49,6 @@
 </template>
 
 <script>
-import colorStore from '@/state/accentColor'
 import userStore from '@/state/userStore'
 import { mapState, mapActions } from 'pinia'
 import UserProfileCard from '@/components/UserProfileCard.vue'
@@ -62,6 +61,8 @@ export default {
     UserProfileCard,
     userNoticeProfile
   },
+
+  inject: ['accentColor'],
 
   /**
    * This is for when the user is already on the profile page during a user search
@@ -86,7 +87,6 @@ export default {
   mounted() {},
 
   computed: {
-    ...mapState(colorStore, ['accentColor']),
     ...mapState(userStore, ['loggedInUser', 'userProfile']),
 
     tabName() {
@@ -149,7 +149,6 @@ export default {
     },
 
     getNumberSuffix(day) {
-      //Ordinal suffixes algo from https://www.freecodecamp.org/news/format-dates-with-ordinal-number-suffixes-javascript/
       if (day >= 11 && day <= 13) {
         return 'th'
       }

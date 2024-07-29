@@ -26,6 +26,15 @@ export default {
     this.initiateApp()
   },
 
+  provide() {
+    return {
+      accentColor: this.accentColor,
+      backgroundColor: this.backgroundColor,
+      backgroundPosition: this.backgroundPosition,
+      duration: this.duration
+    }
+  },
+
   data() {
     return {
       authInitiated: false
@@ -33,7 +42,12 @@ export default {
   },
 
   computed: {
-    ...mapState(colorStore, ['accentColor', 'duration'])
+    ...mapState(colorStore, [
+      'accentColor',
+      'backgroundColor',
+      'backgroundPosition',
+      'duration'
+    ])
   },
 
   methods: {
@@ -67,6 +81,13 @@ export default {
 </script>
 
 <style>
+/* :root { // leaving this here as an idea
+  --testvar: v-bind(accentColor);
+}
+Look into scss variables
+
+*/
+
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
@@ -92,6 +113,10 @@ svg {
   &.stroke {
     stroke: v-bind(accentColor);
   }
+}
+
+.accent-text {
+  color: v-bind(accentColor);
 }
 
 .temporaryBG {

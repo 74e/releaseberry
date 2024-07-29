@@ -99,7 +99,6 @@ export default {
 
   methods: {
     updateNoteContent(event) {
-      console.log(event.target.value)
       this.$emit('update:noteContent', event.target.value)
     },
     /*

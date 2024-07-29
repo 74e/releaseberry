@@ -40,11 +40,10 @@
 </template>
 
 <script>
-import colorStore from '@/state/accentColor'
 import userStore from '@/state/userStore'
 import SettingsMenu from './SettingsMenu.vue'
 import { mapState } from 'pinia'
-import AuthModal from './AuthModal.vue'
+import AuthModal from './uiComponents/AuthModal.vue'
 import UserSearchModal from './UserSearchModal.vue'
 
 export default {
@@ -55,6 +54,8 @@ export default {
     AuthModal,
     UserSearchModal
   },
+
+  inject: ['accentColor'],
 
   data() {
     return {
@@ -81,7 +82,6 @@ export default {
   },
 
   computed: {
-    ...mapState(colorStore, ['accentColor']),
     ...mapState(userStore, ['username']),
 
     RenderedmavItems() {

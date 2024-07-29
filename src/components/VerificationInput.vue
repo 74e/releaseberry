@@ -1,7 +1,15 @@
 <template>
   <div class="input-container">
     <div class="label-and-verfication">
-      <label :for="verificationName">{{ label }}</label>
+      <label :for="verificationName">
+        {{ label }}
+        <UserNotice
+          v-if="noticeMessage"
+          iconSize="15"
+          :noticeMessage="noticeMessage"
+          width="275"
+        />
+      </label>
       <LoadingAnimIcon v-if="isLoading" />
       <div v-if="isValid && !inputValue.length < 1" class="success-message">
         {{ successMessage }}
@@ -22,11 +30,16 @@
 </template>
 
 <script>
+import UserNotice from './UserNotice.vue'
 import userStore from '../state/userStore.js'
 import { mapActions } from 'pinia'
 
 export default {
   name: 'VerificationFormItemComponent',
+
+  components: {
+    UserNotice
+  },
 
   props: {
     label: {
@@ -54,11 +67,6 @@ export default {
       default: ''
     },
 
-    outlineColor: {
-      type: String,
-      default: 'var(--accent-color)'
-    },
-
     verificationName: {
       type: String,
       default: ''
@@ -72,6 +80,11 @@ export default {
       }
     },
 
+    noticeMessage: {
+      type: String,
+      default: ''
+    },
+
     isRequired: {
       type: Boolean,
       default: true
@@ -82,6 +95,8 @@ export default {
       default: null
     }
   },
+
+  inject: ['accentColor'],
 
   data() {
     return {
@@ -99,10 +114,6 @@ export default {
   computed: {
     successMessage() {
       switch (this.verificationName) {
-        case 'username':
-          return `${this.label} available`
-        case 'email':
-          return `${this.label} available`
         case 'password':
           return 'Valid password'
         case 'confirmPassword':
@@ -114,19 +125,19 @@ export default {
   },
 
   methods: {
-    // This is all a mess, I dont have the time to remake the sign up logic
-    // TODO: REMAKE THE SIGN UP LOGIC
-    ...mapActions(userStore, ['usernameTakenValidation', 'emailTakenValidation']),
+    ...mapActions(userStore, ['handleTakenValidation', 'emailTakenValidation']),
 
     updateInputValue(e) {
       this.$emit('update:inputValue', e.target.value)
     },
 
     validateInput() {
-      if (this.verificationName === 'username') {
-        this.verify(this.usernameTakenValidation)
+      if (this.verificationName === 'handle') {
+        this.verify(this.handleTakenValidation)
       } else if (this.verificationName === 'email') {
         this.verify(this.emailTakenValidation)
+      } else if (this.verificationName === 'username') {
+        this.matchRegexPattern()
       } else if (this.verificationName === 'password') {
         this.matchRegexPattern()
       } else if (this.verificationName === 'confirmPassword') {
@@ -206,6 +217,8 @@ export default {
 
   label {
     margin: 0 8px 6px 12px;
+    display: flex;
+    align-items: center;
   }
 
   input {
@@ -218,7 +231,7 @@ export default {
     outline: none;
 
     &:focus {
-      outline: 1px solid v-bind(outlineColor + '90');
+      outline: 1px solid v-bind(accentColor + '90');
     }
   }
 

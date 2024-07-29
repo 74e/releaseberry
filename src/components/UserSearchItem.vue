@@ -63,20 +63,6 @@ export default {
       margin: 0;
     }
 
-    &::before {
-      content: '';
-      display: block;
-      position: absolute;
-      left: 0;
-      top: 2px;
-      border-radius: 4px;
-      width: 3px;
-      height: 35px;
-      background-color: v-bind(accentColor);
-      transition: all 0.3s ease-out;
-      opacity: 100%;
-    }
-
     h2 {
       font-size: 18px;
       font-weight: 500;

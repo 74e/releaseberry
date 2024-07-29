@@ -5,7 +5,7 @@
       <ReleaseBerryIcon />
     </div>
 
-    <h2>Create an account <UserNotice /></h2>
+    <h2>Create an account <UserNotice iconSize="19" xShift="-90" width="300" /></h2>
 
     <span v-if="error" class="went-wrong">{{ error }}</span>
 
@@ -18,10 +18,11 @@
         :error="field.error"
         :verificationName="field.name"
         :pattern="field.pattern"
+        :isRequired="field.required"
+        :noticeMessage="field.noticeMessage"
         v-model:isLoading="field.isLoading"
         v-model:isValid="field.valid"
         v-model:inputValue="field.value"
-        :outlineColor="accentColor"
       />
 
       <button type="submit">Create account</button>
@@ -37,9 +38,8 @@
 <script>
 import userStore from '../state/userStore.js'
 import UserNotice from './UserNotice.vue'
-import colorStore from '../state/accentColor.js'
 import VerficationInput from './VerificationInput.vue'
-import { mapActions, mapState } from 'pinia'
+import { mapActions } from 'pinia'
 
 export default {
   name: 'AuthModalComponent',
@@ -49,47 +49,67 @@ export default {
     VerficationInput
   },
 
-  inject: ['hide'],
+  inject: ['hide', 'accentColor'],
 
   data() {
     return {
       formFields: [
         {
-          label: 'Username',
-          name: 'username',
+          label: 'User Handle',
+          name: 'handle',
+          noticeMessage: 'User handles are unique and can be used to login.',
           value: '',
           inputType: 'text',
           isLoading: false,
           valid: false,
-          pattern: /^[a-zA-Z0-9\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FFF]{1,21}$/,
+          pattern: /\b([A-Za-z0-9_]{1,21})\b/,
+          required: true,
+          error: 'Handle too long (max 21 characters)'
+        },
+        {
+          label: 'Username',
+          name: 'username',
+          noticeMessage: '',
+          value: '',
+          inputType: 'text',
+          isLoading: false,
+          valid: false,
+          pattern: /^[a-zA-Z0-9_\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FFF-]{1,21}$/,
+          required: true,
           error: 'Username too long (max 21 characters)'
         },
         {
-          label: 'Email',
+          label: 'Email (Optional)',
           name: 'email',
+          noticeMessage: 'Email is not required but recommended (Password reset),',
           value: '',
           inputType: 'email',
           isLoading: false,
           valid: false,
           pattern: /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
+          required: false,
           error: 'Invalid email format'
         },
         {
           label: 'Password',
           name: 'password',
+          noticeMessage: '',
           value: '',
           inputType: 'password',
           valid: false,
           pattern: /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/,
+          required: true,
           error: `Password must be at least 8 characters long and consist of letters, numbers and special characters.`
         },
         {
           label: 'Confirm Password',
           name: 'confirmPassword',
+          noticeMessage: '',
           value: '',
           inputType: 'password',
           valid: false,
           pattern: '',
+          required: true,
           error: 'Passwords do not match'
         }
       ],
@@ -98,20 +118,14 @@ export default {
     }
   },
 
-  computed: {
-    ...mapState(colorStore, ['accentColor'])
-  },
-
   watch: {
     formFields: {
       handler() {
         const passwordField = this.formFields.filter((field) => field.name === 'password')
-        this.formFields.filter((field) => {
+        this.formFields.forEach((field) => {
           if (field.name === 'confirmPassword') {
             field.pattern = passwordField[0].value
           }
-
-          return field
         })
       },
       deep: true
@@ -126,9 +140,14 @@ export default {
     },
 
     async handleSubmit() {
-      if (this.formFields.every((field) => field.valid)) {
+      if (
+        this.formFields.every((field) => {
+          if (field.name === 'email' && field.value === '') return true
+          return field.valid
+        })
+      ) {
         const formDetails = this.formFields.reduce((acc, field) => {
-          acc[field.name] = field.value
+          acc[field.name] = field.value || null
           return acc
         }, {})
 
@@ -139,6 +158,7 @@ export default {
 
           this.$router.push('/')
           this.hide()
+          this.$emit('redirect')
         } catch (error) {
           this.error = error.response.data.error
 

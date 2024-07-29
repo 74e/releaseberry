@@ -10,13 +10,14 @@ const userStore = defineStore('User', {
   getters: {
     loggedInUser: (state) => state.user,
     username: (state) => state.user?.username,
+    userHandle: (state) => state.user?.handle,
     currentUserProfile: (state) => state.userProfile
   },
 
   actions: {
-    async usernameTakenValidation(username) {
+    async handleTakenValidation(handle) {
       try {
-        await userService.usernameTakenValidation(username)
+        await userService.handleTakenValidation(handle)
       } catch (error) {
         console.error(error)
         throw error
@@ -32,9 +33,14 @@ const userStore = defineStore('User', {
       }
     },
 
-    async createAccount({ username, email, password }) {
+    async createAccount({ handle, username, email, password }) {
       try {
-        const { data } = await userService.createAccount(username, email, password)
+        const { data } = await userService.createAccount(
+          handle,
+          username,
+          email,
+          password
+        )
         const { newUser, token } = data
 
         this.user = newUser
@@ -45,9 +51,9 @@ const userStore = defineStore('User', {
       }
     },
 
-    async login({ email, password }) {
+    async login({ userHandleOrEmail, password }) {
       try {
-        const { data } = await userService.login(email, password)
+        const { data } = await userService.login(userHandleOrEmail, password)
         const { user, token } = data
 
         this.user = user

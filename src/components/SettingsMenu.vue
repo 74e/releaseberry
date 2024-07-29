@@ -30,7 +30,7 @@
 </template>
 
 <script>
-import WindowPopup from './WindowPopup.vue'
+import WindowPopup from './uiComponents/WindowPopup.vue'
 import userStore from '@/state/userStore'
 import { mapState, mapActions } from 'pinia'
 

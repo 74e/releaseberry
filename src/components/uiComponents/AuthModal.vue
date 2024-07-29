@@ -9,8 +9,8 @@
 
 <script>
 import ModalPopup from './ModalPopup.vue'
-import LoginForm from './LoginForm.vue'
-import CreateAccountForm from './CreateAccountForm.vue'
+import LoginForm from '../LoginForm.vue'
+import CreateAccountForm from '../CreateAccountForm.vue'
 
 export default {
   name: 'AuthModalComponent',

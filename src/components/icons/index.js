@@ -29,6 +29,9 @@ import LoginIcon from './LoginIcon.vue'
 import LogoutIcon from './LogoutIcon.vue'
 import NoticeIcon from './NoticeIcon.vue'
 import LoadingAnimIcon from './LoadingAnimIcon.vue'
+import CheckmarkIcon from './CheckmarkIcon.vue'
+import FollowedCheckmarkIcon from './FollowedCheckmarkIcon.vue'
+import SaveIcon from './SaveIcon.vue'
 
 export default {
   AchievementIcon,
@@ -61,5 +64,8 @@ export default {
   LoginIcon,
   LogoutIcon,
   NoticeIcon,
-  LoadingAnimIcon
+  LoadingAnimIcon,
+  CheckmarkIcon,
+  FollowedCheckmarkIcon,
+  SaveIcon
 }

@@ -1,16 +1,17 @@
 import { api } from './api'
 
 export default {
-  usernameTakenValidation(username) {
-    return api.post('user/validate-username', { username })
+  handleTakenValidation(handle) {
+    return api.post('user/validate-handle', { handle })
   },
 
   emailTakenValidation(email) {
     return api.post('user/validate-email', { email })
   },
 
-  createAccount(username, email, password, steam_id) {
+  createAccount(handle, username, email, password, steam_id) {
     return api.post('user/create-account', {
+      handle,
       username,
       email,
       password,
@@ -18,9 +19,9 @@ export default {
     })
   },
 
-  login(email, password) {
+  login(userHandleOrEmail, password) {
     return api.post('user/login', {
-      email,
+      userHandleOrEmail,
       password
     })
   },

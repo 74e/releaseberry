@@ -8,7 +8,7 @@ import avatar7 from './avatars/avatar7.jpg'
 import avatar8 from './avatars/avatar8.jpg'
 import avatar9 from './avatars/avatar9.jpg'
 import avatar10 from './avatars/avatar10.jpg'
-// import avatar11 from './avatars/avatar11.jpg'
+import avatar11 from './avatars/avatar11.jpg'
 import avatar12 from './avatars/avatar12.jpg'
 import avatar13 from './avatars/avatar13.jpg'
 import avatar14 from './avatars/avatar14.jpg'
@@ -24,7 +24,7 @@ const avatars = [
   avatar8,
   avatar9,
   avatar10,
-  // avatar11,
+  avatar11,
   avatar12,
   avatar13,
   avatar14

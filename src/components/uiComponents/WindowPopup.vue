@@ -17,11 +17,10 @@
 </template>
 
 <script>
-import colorStore from '../state/accentColor.js'
-import { mapState } from 'pinia'
-
 export default {
   name: 'WindowPopupComponent',
+
+  inject: ['accentColor'],
 
   props: {
     width: {
@@ -78,6 +77,16 @@ export default {
       default: 12
     },
 
+    xShift: {
+      type: String,
+      default: '0'
+    },
+
+    yShift: {
+      type: String,
+      default: '0'
+    },
+
     trigger: {
       type: String,
       default: 'click',
@@ -111,8 +120,6 @@ export default {
   },
 
   computed: {
-    ...mapState(colorStore, ['accentColor', 'duration']),
-
     windowPosition() {
       let [primary, secondary] = this.position.split('-')
       let variation = { center: 50, left: 100, right: 0, top: 100, bottom: 0 }
@@ -120,8 +127,8 @@ export default {
 
       let direction = `${reversePosition[primary]}: calc(100% + ${this.margin}px);`
       let alignment = ['bottom', 'top'].includes(primary)
-        ? `left: ${variation[secondary]}%; transform: translateX(-${variation[secondary]}%);`
-        : `top: ${variation[secondary]}%; transform: translateY(-${variation[secondary]}%);`
+        ? `left: ${variation[secondary]}%; transform: translateX(calc(-${variation[secondary]}% + ${this.xShift}px));`
+        : `top: ${variation[secondary]}%; transform: translateY(calc(-${variation[secondary]}% + ${this.yShift}px));`
 
       return `${direction} ${alignment}`
     },
@@ -241,7 +248,7 @@ export default {
 }
 
 .window {
-  width: v-bind(width);
+  width: v-bind(width + 'px');
   background-color: var(--dark-50);
   box-shadow: var(--shadow-default);
   border-radius: v-bind(borderRadiusSize);

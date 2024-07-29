@@ -1,5 +1,5 @@
 <template>
-  <transition name="fade">
+  <transition class="modal" name="fade">
     <div
       @click.self="handleClickOutside"
       @close="hide"
@@ -17,11 +17,10 @@
 </template>
 
 <script>
-import colorStore from '../state/accentColor.js'
-import { mapState } from 'pinia'
-
 export default {
   name: 'ModalPopupComponent',
+
+  inject: ['accentColor', 'duration'],
 
   props: {
     clickOutside: {
@@ -92,8 +91,6 @@ export default {
   },
 
   computed: {
-    ...mapState(colorStore, ['accentColor', 'duration']),
-
     borderStyle() {
       return this.accentBorders.reduce((border, selectedBorder) => {
         return (border += `border-${selectedBorder}: ${this.borderWidth}px solid ${this.accentColor};`)
@@ -124,6 +121,10 @@ export default {
 </script>
 
 <style scoped>
+.modal {
+  z-index: 1;
+}
+
 .modal-background {
   position: fixed;
   inset: 0;
