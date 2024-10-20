@@ -1,29 +1,35 @@
 <template>
-  <router-view v-slot="{ Component }">
-    <transition name="fade" mode="out-in">
-      <component v-if="authInitiated" :is="Component" />
-    </transition>
-  </router-view>
-  <NavbarMenu />
+  <div class="page-container">
+    <router-view v-slot="{ Component }">
+      <transition name="fade" mode="out-in">
+        <component v-if="authInitiated" :is="Component" />
+      </transition>
+    </router-view>
+    <NavbarMenu />
+  </div>
 
+  <ToasterComponent />
+  <ProfileImagePreloader />
   <div class="temporaryBG" />
 </template>
 
 <script>
-import colorStore from './state/accentColor'
-import userStore from './state/userStore'
-import { mapState, mapActions } from 'pinia'
-import { RouterView } from 'vue-router'
-import NavbarMenu from './components/NavbarMenu.vue'
+import colorStore from './state/colorStore';
+import userStore from './state/userStore';
+import cardStore from './state/cardStore';
+import { toastStore } from './state/toastStore';
+import { mapState, mapActions } from 'pinia';
+import { RouterView } from 'vue-router';
+import NavbarMenu from './components/NavbarMenu.vue';
+import ToasterComponent from './components/ToasterComponent.vue';
+import ProfileImagePreloader from './components/ProfileImagePreloader.vue';
 
 export default {
   components: {
     RouterView,
-    NavbarMenu
-  },
-
-  created() {
-    this.initiateApp()
+    NavbarMenu,
+    ToasterComponent,
+    ProfileImagePreloader
   },
 
   provide() {
@@ -32,13 +38,17 @@ export default {
       backgroundColor: this.backgroundColor,
       backgroundPosition: this.backgroundPosition,
       duration: this.duration
-    }
+    };
   },
 
   data() {
     return {
       authInitiated: false
-    }
+    };
+  },
+
+  created() {
+    this.initiateApp();
   },
 
   computed: {
@@ -52,41 +62,43 @@ export default {
 
   methods: {
     ...mapActions(userStore, ['persistentLogin', 'logout']),
+    ...mapActions(cardStore, ['getUserCardConfigurations']),
 
-    /**
-     * Most of the app is relient on if the userStore has fetched
-     * the currents users data. Setting this function to async
-     * and letting it dictate when/if the app is initiated makes sure that
-     * no matter how slow the connection is the result of any other
-     * logic relient on the user will be determenistic. I'll still handle
-     * each case as if it could be undefined, but this way I can be sure
-     *
+    /*
      * TODO: Add fancy loading screen animation
      */
+
     async initiateApp() {
-      const session = localStorage.getItem('RBsession')
+      const session = localStorage.getItem('RBsession');
       if (session) {
         try {
-          await this.persistentLogin()
+          await this.persistentLogin();
+          const { username } = userStore().loggedInUser;
+
+          toastStore().add({
+            icon: 'ProfileIcon',
+            message: `Welcome back ${username}`
+          });
         } catch (error) {
-          console.error(error)
-          this.logout()
+          toastStore().handleErrorMessage(error, `Something went wrong, couldn't login`);
+          this.logout();
         }
       }
 
-      this.authInitiated = true
+      this.authInitiated = true;
     }
   }
-}
+};
 </script>
 
 <style>
-/* :root { // leaving this here as an idea
-  --testvar: v-bind(accentColor);
-}
-Look into scss variables
+.page-container {
+  padding: 0 0 0 45px;
 
-*/
+  @media (max-width: 750px) {
+    padding: 0 0 45px 0;
+  }
+}
 
 .fade-enter-from,
 .fade-leave-to {
@@ -127,5 +139,11 @@ svg {
   mix-blend-mode: lighten;
 
   z-index: -20;
+}
+
+.test-extend {
+  background-color: purple;
+  padding: 8px;
+  border: 1px solid blue;
 }
 </style>

@@ -47,11 +47,12 @@
 </template>
 
 <script>
-import userStore from '../state/userStore.js'
-import { mapActions, mapState } from 'pinia'
+import userStore from '../state/userStore.js';
+import { toastStore } from '../state/toastStore';
+import { mapActions, mapState } from 'pinia';
 
 export default {
-  name: 'AuthModalComponent',
+  name: 'LoginForm',
 
   inject: ['hide', 'accentColor'],
 
@@ -62,7 +63,7 @@ export default {
       error: '',
       isLoading: false,
       success: false
-    }
+    };
   },
 
   computed: {
@@ -73,41 +74,45 @@ export default {
     ...mapActions(userStore, ['login']),
 
     redirect() {
-      this.$emit('redirect')
+      this.$emit('redirect');
     },
 
     async handleSubmit() {
-      this.isLoading = true
+      this.isLoading = true;
 
       try {
         await this.login({
           userHandleOrEmail: this.userHandleOrEmail,
           password: this.password
-        })
+        });
 
-        this.handleSuccesfulLogin()
+        this.handleSuccesfulLogin();
       } catch (error) {
         // Adds custom error message from backend
-        this.error = error.response.data.error
+        if (error?.response?.data.error) {
+          this.error = error.response.data.error;
 
-        setTimeout(() => {
-          this.error = ''
-        }, 3000)
+          setTimeout(() => {
+            this.error = '';
+          }, 3000);
+        } else {
+          toastStore().handleErrorMessage(error, `Something went wrong, Could not login`);
+        }
       } finally {
-        this.isLoading = false
+        this.isLoading = false;
       }
     },
 
     handleSuccesfulLogin() {
-      this.success = true
+      this.success = true;
 
       setTimeout(() => {
-        this.hide()
-        this.$router.push('/')
-      }, 2000)
+        this.hide();
+        this.$router.push('/');
+      }, 2000);
     }
   }
-}
+};
 </script>
 
 <style scoped>

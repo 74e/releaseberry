@@ -2,52 +2,62 @@
   <nav>
     <ul>
       <li>
+        <RouterLink to="/global">
+          <div class="icon-box">
+            <ReleaseBerryIcon />
+          </div>
+        </RouterLink>
+      </li>
+
+      <li>
         <RouterLink to="/">
-          <ReleaseBerryIcon />
-          <span>Notes</span>
+          <div class="icon-box">
+            <LibraryIcon />
+          </div>
         </RouterLink>
       </li>
 
       <li>
         <RouterLink :to="`/user/${this.username || ''}`">
-          <ProfileIcon />
-          <span>Profile</span>
-        </RouterLink>
-      </li>
-
-      <li>
-        <RouterLink to="/notes">
-          <NotesIcon />
-          <span>Notes</span>
+          <div class="icon-box">
+            <ProfileIcon />
+          </div>
         </RouterLink>
       </li>
 
       <li @click="openUserSearchModal">
-        <SearchIcon />
+        <div class="icon-box">
+          <SearchIcon />
+        </div>
       </li>
 
       <SettingsMenu @openModal="openAuthModal">
-        <li>
+        <div class="icon-box dot">
           <DotMenuIcon />
-        </li>
+        </div>
       </SettingsMenu>
     </ul>
-
-    <div class="active-link-indicator" />
   </nav>
-  <AuthModal v-model:showModal="showAuthModal" />
-  <UserSearchModal ref="UserSearchModal" v-model:showModal="showUserSearchModal" />
+
+  <TransitionGroup name="fade">
+    <AuthModal v-if="showAuthModal" v-model:showModal="showAuthModal" />
+    <UserSearchModal
+      ref="UserSearchModal"
+      v-if="showUserSearchModal"
+      v-model:showModal="showUserSearchModal"
+    />
+  </TransitionGroup>
 </template>
 
 <script>
-import userStore from '@/state/userStore'
-import SettingsMenu from './SettingsMenu.vue'
-import { mapState } from 'pinia'
-import AuthModal from './uiComponents/AuthModal.vue'
-import UserSearchModal from './UserSearchModal.vue'
+import userStore from '@/state/userStore';
+import SettingsMenu from './SettingsMenu.vue';
+import { mapState } from 'pinia';
+import AuthModal from './AuthModal.vue';
+import UserSearchModal from './UserSearchModal.vue';
 
 export default {
-  name: 'NavbarMenuComponent',
+  name: 'NavbarMenu',
 
   components: {
     SettingsMenu,
@@ -59,73 +69,37 @@ export default {
 
   data() {
     return {
-      navItems: [{ pathName: 'main' }, { pathName: 'profile' }, { pathName: 'notes' }],
-      renderedNavItems: null,
-      currentIndex: 0,
-      indicatorOffset: null,
       showAuthModal: false,
       showUserSearchModal: false
-    }
-  },
-
-  watch: {
-    $route: {
-      handler(updatedRoute) {
-        this.currentIndex = this.navItems.findIndex((item) => {
-          return item.pathName === updatedRoute.name
-        })
-
-        this.setActiveLinkIndicator(this.currentIndex)
-      },
-      deep: true
-    }
+    };
   },
 
   computed: {
-    ...mapState(userStore, ['username']),
-
-    RenderedmavItems() {
-      return this.navItems.map((item) => {
-        if (item.pathName === 'profile' && this.username) {
-          item.path += `/${this.username}`
-        }
-        return item
-      })
-    }
+    ...mapState(userStore, ['username'])
   },
 
   methods: {
-    setActiveLinkIndicator(index = 0) {
-      this.currentIndex = index
-      // --------------------  BAD SOLUTION  -----------------------------------------
-      const startingOffset = 35
-      const distanceToNextItem = 17.6
-      this.indicatorOffset = `${index * distanceToNextItem}% + ${startingOffset}px`
-    },
-
     openAuthModal() {
-      this.showAuthModal = true
+      this.showAuthModal = true;
     },
 
     openUserSearchModal() {
-      this.showUserSearchModal = true
-      this.$refs.UserSearchModal.focusSearch()
+      this.showUserSearchModal = true;
     }
   }
-}
+};
 </script>
 
 <style scoped>
 nav {
-  width: 65px;
-  height: 340px;
+  width: 45px;
+  height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
   position: fixed;
-  bottom: 50%;
-  left: 24px;
-  transform: translateY(50%);
+  top: 0;
+  left: 0;
 
   ul {
     list-style-type: none;
@@ -133,76 +107,42 @@ nav {
     margin: 0;
     display: flex;
     align-items: center;
-    justify-content: space-evenly;
+    justify-content: center;
     flex-direction: column;
-    width: 100%;
-    height: 100%;
+    gap: 26px;
 
-    @media (max-width: 1050px), (max-height: 750px) {
+    @media (max-width: 750px) {
       flex-direction: row;
     }
 
     li {
-      height: 22px;
+      display: flex;
+      cursor: pointer;
+    }
+    .icon-box {
       width: 22px;
+      height: 22px;
       display: flex;
       align-items: center;
       justify-content: center;
-      position: relative;
       cursor: pointer;
-      transition: all 0.3s ease-out;
+    }
 
-      &:hover {
-        filter: var(--hover-filter-effect);
-      }
-
-      &:hover span {
-        display: block;
-        animation: delayedFadeIn 0.8s;
-
-        @media (max-width: 1050px), (max-height: 750px) {
-          display: none;
-        }
-      }
+    .dot {
+      margin-top: -4px;
     }
   }
 
-  @media (max-width: 1220px) {
-    width: 54px;
-    left: 0;
-    border-radius: 0 var(--radius-m) var(--radius-m) 0 !important;
-  }
-
-  @media (max-width: 1050px), (max-height: 750px) {
+  @media (max-width: 750px) {
     flex-direction: row;
-    width: 340px;
-    height: 65px;
-    left: 50%;
-    bottom: 16px;
-    transform: translateX(-50%);
-    border-radius: var(--radius-m) !important;
-  }
-
-  @media (max-width: 336px) {
+    align-items: center;
+    width: 100vw;
+    height: 50px;
     bottom: 0;
-  }
+    top: unset;
 
-  .active-link-indicator {
-    width: 3px;
-    height: 30px;
-    background-color: v-bind(accentColor);
-    filter: brightness(120%);
-    border-radius: 2px;
-    position: absolute;
-    top: calc(v-bind(indicatorOffset));
-    right: 0;
-    transition: all 0.3s ease-out;
-
-    @media (max-width: 1050px), (max-height: 750px) {
-      top: 0;
-      left: calc(v-bind(indicatorOffset));
-      height: 3px;
-      width: 30px;
+    .dot {
+      margin-top: 0 !important;
     }
   }
 }
@@ -210,7 +150,7 @@ nav {
 span {
   position: absolute;
   top: 50%;
-  left: 60px;
+  left: 40px;
   transform: translateY(-50%);
   color: v-bind(accentColor);
   padding: 8px 16px;
@@ -225,26 +165,12 @@ a {
   filter: var(--hover-filter-effect);
 }
 
-nav,
-span {
+nav {
   background-color: var(--dark-50);
   box-shadow:
     0px 4px 4px rgba(0, 0, 0, 0.25),
     0px 8px 11px rgba(0, 0, 0, 0.25);
   backdrop-filter: blur(10px);
   border-radius: var(--radius-m);
-}
-
-@keyframes delayedFadeIn {
-  0% {
-    display: block;
-    opacity: 0;
-  }
-  90% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
 }
 </style>

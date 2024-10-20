@@ -3,7 +3,7 @@
     <span :class="['label', labelPosition]">{{ label }}</span>
 
     <div class="input-preview" @click="handletoggleDropdown">
-      {{ selectedValueComputed }}
+      {{ targetDisplay ? selectedValue[targetDisplay] : selectedValue }}
 
       <TinyArrowIcon :class="{ active: isDropDownOpen }" />
     </div>
@@ -14,10 +14,10 @@
           class="option"
           @click="selectNewOption(option)"
           v-for="option in optionValues"
-          :class="{ active: selectedValueComputed === option }"
+          :class="{ active: isActiveValue(option) }"
           :key="option"
         >
-          {{ targetValue ? option[targetValue] : option }}
+          {{ targetDisplay ? option[targetDisplay] : option }}
         </div>
       </div>
     </div>
@@ -26,7 +26,7 @@
 
 <script>
 export default {
-  name: 'DropDownComponent',
+  name: 'DropDown',
 
   inject: ['accentColor'],
 
@@ -40,7 +40,7 @@ export default {
       type: String,
       default: 'default',
       validator(value) {
-        return ['default', 'center'].includes(value)
+        return ['default', 'center'].includes(value);
       }
     },
 
@@ -56,7 +56,12 @@ export default {
       required: true
     },
 
-    targetValue: {
+    targetDisplay: {
+      type: [String, null],
+      default: null
+    },
+
+    targetIdentifier: {
       type: [String, null],
       default: null
     },
@@ -70,7 +75,7 @@ export default {
       type: Number,
       default: 3,
       validator(value) {
-        return value > 0
+        return value > 0;
       }
     },
 
@@ -83,41 +88,72 @@ export default {
   data() {
     return {
       isDropDownOpen: false
-    }
+    };
   },
 
   mounted() {
-    document.addEventListener('click', this.handleClickOutside)
+    document.addEventListener('click', this.handleClickOutside);
   },
 
   beforeUnmount() {
-    document.removeEventListener('click', this.handleClickOutside)
+    document.removeEventListener('click', this.handleClickOutside);
   },
 
   computed: {
     selectedValueComputed() {
-      return this.targetValue ? this.selectedValue[this.targetValue] : this.selectedValue
+      if (this.targetIdentifier) {
+        return this.targetIdentifier;
+      } else {
+        return this.targetDisplay
+          ? this.selectedValue[this.targetDisplay]
+          : this.selectedValue;
+      }
     }
   },
 
   methods: {
     handletoggleDropdown() {
-      this.isDropDownOpen = !this.isDropDownOpen
+      this.isDropDownOpen = !this.isDropDownOpen;
     },
 
     selectNewOption(option) {
-      this.$emit('update:selectedValue', option)
+      if (this.isActiveValue(option)) return;
 
-      this.isDropDownOpen = false
+      this.$emit('update:selectedValue', option);
+      this.$emit('onSelect');
+
+      this.isDropDownOpen = false;
     },
 
     handleClickOutside(e) {
       if (!this.$refs.dropdown.contains(e.target) && this.$refs.dropdown !== e.target) {
-        this.isDropDownOpen = false
+        this.isDropDownOpen = false;
+      }
+    },
+
+    selecteedValueComputed() {
+      if (this.targetIdentifier) {
+        return this.selectedValue[this.targetIdentifier];
+      } else {
+        return this.targetDisplay
+          ? this.selectedValue[this.targetDisplay]
+          : this.selectedValue;
+      }
+    },
+
+    isActiveValue(option) {
+      if (this.targetIdentifier) {
+        return (
+          this.selectedValue[this.targetIdentifier] === option[this.targetIdentifier]
+        );
+      } else if (this.targetDisplay) {
+        return this.selectedValue[this.targetDisplay] === option[this.targetDisplay];
+      } else {
+        return this.selectedValue === option;
       }
     }
   }
-}
+};
 </script>
 
 <style scoped>

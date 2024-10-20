@@ -32,7 +32,7 @@
 
 <script>
 export default {
-  name: 'AccordionItemComponent',
+  name: 'AccordionItem',
 
   inject: ['accentColor'],
 
@@ -54,7 +54,7 @@ export default {
       type: String,
       default: 'accordion',
       validator: function (value) {
-        return ['accordion', 'tab'].indexOf(value) !== -1
+        return ['accordion', 'tab'].indexOf(value) !== -1;
       }
     },
 
@@ -67,25 +67,25 @@ export default {
   data() {
     return {
       open: true
-    }
+    };
   },
 
   computed: {
     active() {
-      if (this.tabType === 'tab') return this.open
+      if (this.tabType === 'tab') return this.open;
 
-      return this.isActive
+      return this.isActive;
     }
   },
 
   methods: {
     toggleVisibility() {
       if (this.tabType === 'tab') {
-        this.open = !this.open
+        this.open = !this.open;
       }
     }
   }
-}
+};
 </script>
 
 <style scoped>

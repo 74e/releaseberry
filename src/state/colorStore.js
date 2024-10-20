@@ -1,10 +1,10 @@
-import { defineStore } from 'pinia'
+import { defineStore } from 'pinia';
 
-const initialColor = '#26b3bd'
-const initialPosition = 'left'
-const transitionedPosition = 'right'
-const initialDuration = 0.3
-const extendedDuration = 1.5
+const initialColor = '#26b3bd';
+const initialPosition = 'left';
+const transitionedPosition = 'right';
+const initialDuration = 0.3;
+const extendedDuration = 1.5;
 
 const colorStore = defineStore('accentColor', {
   state: () => ({
@@ -25,25 +25,25 @@ const colorStore = defineStore('accentColor', {
   actions: {
     // Add actions to get color from hovered card to then apply to global accent color
     setDefaultColor() {
-      clearTimeout(this.colorTimeout)
+      clearTimeout(this.colorTimeout);
 
-      this.color = initialColor
-      this.bgPosition = initialPosition
+      this.color = initialColor;
+      this.bgPosition = initialPosition;
 
       this.colorTimeout = setTimeout(() => {
-        this.animDuration = initialDuration
-      }, extendedDuration * 1000)
+        this.animDuration = initialDuration;
+      }, extendedDuration * 1000);
     },
 
     setNewColor(payloadColor) {
-      clearTimeout(this.colorTimeout)
+      clearTimeout(this.colorTimeout);
 
-      this.animDuration = extendedDuration
-      this.color = payloadColor
-      this.bgColor = payloadColor
-      this.bgPosition = transitionedPosition
+      this.animDuration = extendedDuration;
+      this.color = payloadColor;
+      this.bgColor = payloadColor;
+      this.bgPosition = transitionedPosition;
     }
   }
-})
+});
 
-export default colorStore
+export default colorStore;

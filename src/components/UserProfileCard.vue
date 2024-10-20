@@ -52,14 +52,13 @@
 </template>
 
 <script>
-import userStore from '@/state/userStore'
-import { mapState } from 'pinia'
-import temporaryAvatars from '@/assets/temporaryAvatars'
+import userStore from '@/state/userStore';
+import { mapState } from 'pinia';
 
 export default {
   name: 'ProfileView',
 
-  inject: ['accentColor'],
+  inject: ['accentColor', 'profileImages'],
 
   props: {
     userData: {
@@ -71,7 +70,7 @@ export default {
   data() {
     return {
       activeTab: 'feed'
-    }
+    };
   },
 
   mounted() {},
@@ -85,61 +84,64 @@ export default {
     ]),
 
     isFollowable() {
-      return this.loggedInUser && this.loggedInUser.username !== this.userData.username
+      return this.loggedInUser && this.loggedInUser.username !== this.userData.username;
     },
 
     username() {
-      return this.userData?.username
+      return this.userData?.username;
     },
 
     level() {
-      return this.userData?.level
+      return this.userData?.level;
     },
 
     experience() {
-      return this.userData?.xp
+      return this.userData?.xp;
     },
 
     following() {
-      return this.userData?.followedUsers.length
+      return this.userData?.followedUsers.length;
     },
 
     followers() {
-      return this.userData?.followers.length
+      return this.userData?.followers.length;
+    },
+
+    imageIndex() {
+      return this.userData?.image_index;
     },
 
     avatar() {
-      const randomPick = Math.floor(Math.random() * 12) + 1
-      return temporaryAvatars[randomPick]
+      return this.profileImages[this.imageIndex];
     },
 
     isUserFollowed() {
       return this.userData?.followers.find(
         (follow) => follow.user_id === this.loggedInUser.id
-      )
+      );
     },
 
     followLable() {
-      return this.isUserFollowed ? 'Following' : 'Follow'
+      return this.isUserFollowed ? 'Following' : 'Follow';
     }
   },
 
   methods: {
     async follow() {
-      await this.followUser(this.userData.id)
+      await this.followUser(this.userData.id);
 
       // I am refetching the user profile to update
       // This is not a good method, but it works for now
       // I will implement the updating of the state manually later
-      await this.getUserProfile(this.userData.username)
+      await this.getUserProfile(this.userData.username);
     },
 
     async unfollow() {
-      await this.unfollowUser(this.userData.id)
-      await this.getUserProfile(this.userData.username)
+      await this.unfollowUser(this.userData.id);
+      await this.getUserProfile(this.userData.username);
     }
   }
-}
+};
 </script>
 
 <style scoped>

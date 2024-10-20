@@ -36,13 +36,14 @@
 </template>
 
 <script>
-import userStore from '../state/userStore.js'
-import UserNotice from './UserNotice.vue'
-import VerficationInput from './VerificationInput.vue'
-import { mapActions } from 'pinia'
+import userStore from '../state/userStore.js';
+import { toastStore } from '../state/toastStore';
+import UserNotice from './UserNotice.vue';
+import VerficationInput from './VerificationInput.vue';
+import { mapActions } from 'pinia';
 
 export default {
-  name: 'AuthModalComponent',
+  name: 'CreateAccountForm',
 
   components: {
     UserNotice,
@@ -62,7 +63,7 @@ export default {
           inputType: 'text',
           isLoading: false,
           valid: false,
-          pattern: /\b([A-Za-z0-9_]{1,21})\b/,
+          pattern: /\b([A-Za-z0-9_]{1,22})\b/,
           required: true,
           error: 'Handle too long (max 21 characters)'
         },
@@ -97,7 +98,7 @@ export default {
           value: '',
           inputType: 'password',
           valid: false,
-          pattern: /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/,
+          pattern: /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/,
           required: true,
           error: `Password must be at least 8 characters long and consist of letters, numbers and special characters.`
         },
@@ -115,18 +116,20 @@ export default {
       ],
       isLoading: false,
       error: ''
-    }
+    };
   },
 
   watch: {
     formFields: {
       handler() {
-        const passwordField = this.formFields.filter((field) => field.name === 'password')
+        const passwordField = this.formFields.filter(
+          (field) => field.name === 'password'
+        );
         this.formFields.forEach((field) => {
           if (field.name === 'confirmPassword') {
-            field.pattern = passwordField[0].value
+            field.pattern = passwordField[0].value;
           }
-        })
+        });
       },
       deep: true
     }
@@ -136,42 +139,50 @@ export default {
     ...mapActions(userStore, ['createAccount']),
 
     redirect() {
-      this.$emit('redirect')
+      this.$emit('redirect');
     },
 
     async handleSubmit() {
       if (
         this.formFields.every((field) => {
-          if (field.name === 'email' && field.value === '') return true
-          return field.valid
+          if (field.name === 'email' && field.value === '') return true;
+          return field.valid;
         })
       ) {
         const formDetails = this.formFields.reduce((acc, field) => {
-          acc[field.name] = field.value || null
-          return acc
-        }, {})
+          acc[field.name] = field.value || null;
+          return acc;
+        }, {});
 
-        this.isLoading = true
+        this.isLoading = true;
 
         try {
-          await this.createAccount(formDetails)
+          await this.createAccount(formDetails);
 
-          this.$router.push('/')
-          this.hide()
-          this.$emit('redirect')
+          this.$router.push('/');
+          this.hide();
+          this.$emit('redirect');
         } catch (error) {
-          this.error = error.response.data.error
+          if (error?.response?.data.error) {
+            this.error = error.response.data.error;
 
-          setTimeout(() => {
-            this.error = ''
-          }, 3000)
+            setTimeout(() => {
+              this.error = '';
+            }, 3000);
+          } else {
+            toastStore().handleErrorMessage(
+              error,
+              'NoticeIcon',
+              `Something went wrong, Could not create an account.`
+            );
+          }
         } finally {
-          this.isLoading = false
+          this.isLoading = false;
         }
       }
     }
   }
-}
+};
 </script>
 
 <style scoped>

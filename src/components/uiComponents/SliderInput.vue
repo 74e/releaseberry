@@ -35,6 +35,7 @@ export default {
 
 <style scoped>
 .backdrop {
+  width: fit-content;
   background-color: var(--dark-fg);
   border: 1px solid rgba(255, 255, 255, 0.123);
   height: 34px;

@@ -1,9 +1,11 @@
 import axios from 'axios'
+import qs from 'qs'
 
 export const api = axios.create({
   baseURL: 'http://localhost:8080/api/',
-  timeout: 0,
-  headers: { Accept: 'application/json' }
+  paramsSerializer: (params) => qs.stringify(params, { skipNulls: true }),
+  headers: { Accept: 'application/json' },
+  timeout: 0
 })
 
 api.interceptors.request.use((request) => {

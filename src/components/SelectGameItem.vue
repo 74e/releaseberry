@@ -55,30 +55,26 @@
 
       <LoadingOverlay :isLoading="isLoading" />
     </div>
-
-    <ButtonComponent :disabled="!selectedGameItem" @click="handleProgression('next')">
-      Confirm
-    </ButtonComponent>
   </div>
 </template>
 
 <script>
-import gameStore from '@/state/gameStore'
-import AccordionItem from './uiComponents/AccordionItem.vue'
-import LoadingOverlay from './uiComponents/LoadingOverlay.vue'
-import { mapState, mapActions } from 'pinia'
-import ButtonComponent from './primitiveComponents/ButtonComponent.vue'
+import gameStore from '@/state/gameStore';
+import userStore from '@/state/userStore';
+import { toastStore } from '@/state/toastStore';
+import AccordionItem from './uiComponents/AccordionItem.vue';
+import LoadingOverlay from './uiComponents/LoadingOverlay.vue';
+import { mapState, mapActions } from 'pinia';
 
 export default {
-  name: 'SelectGameItemComponent',
+  name: 'SelectGameItem',
 
   components: {
     AccordionItem,
-    LoadingOverlay,
-    ButtonComponent
+    LoadingOverlay
   },
 
-  inject: ['handleProgression', 'accentColor'],
+  inject: ['accentColor'],
 
   props: {
     selectedGameItem: {
@@ -94,18 +90,22 @@ export default {
       isLoading: false,
       isAlreadyInLibraryAppid: null,
       isAlreadyInLibraryTimeout: null
-    }
+    };
   },
 
   mounted() {
-    this.$emit('update:selectedGameItem', null)
+    this.$emit('update:selectedGameItem', null);
   },
 
   computed: {
     ...mapState(gameStore, ['searchResults']),
+    ...mapState(userStore, ['loggedInUser']),
 
     noGamesFound() {
-      return this.searchResults?.every((result) => result.games.length === 0)
+      return (
+        this.searchResults?.every((result) => result.games.length === 0) &&
+        this.searchQuery !== ''
+      );
     }
   },
 
@@ -113,44 +113,47 @@ export default {
     ...mapActions(gameStore, ['getAvailableGames', 'clearSearchResults']),
 
     async handleSearch() {
-      this.$emit('update:selectedGameItem', null)
+      this.$emit('update:selectedGameItem', null);
 
-      clearTimeout(this.searchTimeout)
+      clearTimeout(this.searchTimeout);
       if (!this.searchQuery) {
-        this.clearSearchResults()
-        return
+        this.clearSearchResults();
+        return;
       }
 
       this.searchTimeout = setTimeout(async () => {
-        this.isLoading = true
+        this.isLoading = true;
 
         try {
-          await this.getAvailableGames(this.searchQuery)
+          await this.getAvailableGames(this.searchQuery, this.loggedInUser?.id);
         } catch (error) {
-          console.error(error)
+          toastStore().handleErrorMessage(
+            error,
+            `Something went wrong, Could not retrieve games`
+          );
         } finally {
-          this.isLoading = false
+          this.isLoading = false;
         }
-      }, 300)
+      }, 300);
     },
 
     selectGame(game) {
       if (game?.isFollowedByUser) {
-        clearTimeout(this.isAlreadyInLibraryTimeout)
+        clearTimeout(this.isAlreadyInLibraryTimeout);
 
-        this.isAlreadyInLibraryAppid = game.appid
+        this.isAlreadyInLibraryAppid = game.appid;
 
         this.isAlreadyInLibraryTimeout = setTimeout(() => {
-          this.isAlreadyInLibraryAppid = null
-        }, 1500)
+          this.isAlreadyInLibraryAppid = null;
+        }, 1500);
 
-        return
+        return;
       }
 
-      this.$emit('update:selectedGameItem', game)
+      this.$emit('update:selectedGameItem', game);
     }
   }
-}
+};
 </script>
 
 <style scoped>
@@ -320,7 +323,7 @@ button {
           overflow: hidden;
           height: 25px;
           width: 0;
-          transition: all 0.3s ease-in;
+          transition: all 0.3s ease-out;
         }
 
         &:hover,

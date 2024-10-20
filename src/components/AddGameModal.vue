@@ -6,7 +6,7 @@
     </div>
 
     <div class="container">
-      <div v-if="!isLoading" class="content">
+      <div class="content">
         <AccordionItem
           title="1. Search for a game"
           description="Check if the game is already in our global library, if not then be the first to add it!"
@@ -16,7 +16,17 @@
           :isActive="openTab === 1"
         >
           <template #content>
-            <SelectGameItem v-model:selectedGameItem="selectedGameItem" />
+            <div>
+              <SelectGameItem v-model:selectedGameItem="selectedGameItem" />
+
+              <ButtonComponent
+                :disabled="!selectedGameItem"
+                @click="handleProgression('next')"
+                style="margin-left: auto; display: block"
+              >
+                Confirm
+              </ButtonComponent>
+            </div>
           </template>
         </AccordionItem>
 
@@ -29,10 +39,25 @@
           :isActive="openTab === 2"
         >
           <template #content>
-            <SelectGameCover
-              :selectedGameItem="selectedGameItem.appid"
-              v-model:selectedGameCover="selectedGameCover"
-            />
+            <div>
+              <SelectGameCover
+                :selectedGameItem="selectedGameItem.appid"
+                v-model:selectedGameCover="selectedGameCover"
+              />
+
+              <div class="btn-container">
+                <ButtonComponent @click="handleProgression('previous')">
+                  Back
+                </ButtonComponent>
+
+                <ButtonComponent
+                  :disabled="!selectedGameCover"
+                  @click="handleProgression('next')"
+                >
+                  Confirm
+                </ButtonComponent>
+              </div>
+            </div>
           </template>
         </AccordionItem>
 
@@ -43,32 +68,43 @@
           :isActive="openTab === 3"
         >
           <template #content>
-            <SelectGameStyle
-              @handleConfirmation="handleSubmit"
-              :selectedGameItem="selectedGameItem"
-              :selectedGameCover="selectedGameCover"
-            />
+            <div>
+              <SelectGameStyle
+                ref="styleSelect"
+                :selectedGameItem="selectedGameItem"
+                :selectedGameCover="selectedGameCover"
+              />
+
+              <div class="btn-container">
+                <ButtonComponent @click="handleProgression('previous')">
+                  Back
+                </ButtonComponent>
+
+                <ButtonComponent @click="handleSubmit"> Confirm </ButtonComponent>
+              </div>
+            </div>
           </template>
         </AccordionItem>
       </div>
-
-      <LoadingOverlay :isLoading="isLoading" v-else />
     </div>
+    <LoadingOverlay :isLoading="isLoading" />
   </ModalPopup>
 </template>
 
 <script>
-import ModalPopup from './uiComponents/ModalPopup.vue'
-import AccordionItem from './uiComponents/AccordionItem.vue'
-import SelectGameItem from './SelectGameItem.vue'
-import SelectGameCover from './SelectGameCover.vue'
-import SelectGameStyle from './SelectGameStyle.vue'
-import LoadingOverlay from './uiComponents/LoadingOverlay.vue'
-import gameStore from '../state/gameStore'
-import { mapActions } from 'pinia'
+import ModalPopup from './uiComponents/ModalPopup.vue';
+import ButtonComponent from './ButtonComponent.vue';
+import AccordionItem from './uiComponents/AccordionItem.vue';
+import SelectGameItem from './SelectGameItem.vue';
+import SelectGameCover from './SelectGameCover.vue';
+import SelectGameStyle from './SelectGameStyle.vue';
+import LoadingOverlay from './uiComponents/LoadingOverlay.vue';
+import gameStore from '../state/gameStore';
+import { toastStore } from '../state/toastStore';
+import { mapActions } from 'pinia';
 
 export default {
-  name: 'AddGameModalComponent',
+  name: 'AddGameModal',
 
   components: {
     ModalPopup,
@@ -76,7 +112,8 @@ export default {
     SelectGameItem,
     SelectGameCover,
     SelectGameStyle,
-    LoadingOverlay
+    LoadingOverlay,
+    ButtonComponent
   },
 
   inject: ['accentColor'],
@@ -84,7 +121,7 @@ export default {
   provide() {
     return {
       handleProgression: this.handleProgression
-    }
+    };
   },
 
   data() {
@@ -93,61 +130,95 @@ export default {
       selectedGameItem: null,
       selectedGameCover: null,
       isLoading: false
-    }
+    };
   },
 
   methods: {
-    ...mapActions(gameStore, ['addIndividualSteamGame']),
+    ...mapActions(gameStore, ['addSteamGame']),
 
     handleTabClick(index) {
-      if (this.openTab <= index) return
+      if (this.openTab <= index) return;
 
-      this.openTab = index
+      this.openTab = index;
     },
 
     handleProgression(action) {
       if (action === 'next') {
-        this.openTab++
+        this.openTab++;
 
-        return
+        return;
       }
 
       if (action === 'previous') {
-        this.openTab--
-        return
+        this.openTab--;
+        return;
       }
     },
 
-    async handleSubmit(payload) {
-      try {
-        this.isLoading = true
-        await this.addIndividualSteamGame(payload)
+    async handleSubmit() {
+      const { payload, gameName } = await this.$refs.styleSelect.handleConfirm();
 
-        this.$refs.modal.hide()
+      if (!payload) return;
+
+      try {
+        this.isLoading = true;
+        await this.addSteamGame(payload);
+
+        this.$refs.modal.hide();
+
+        toastStore().add({
+          icon: 'LibraryIcon',
+          message: `<b>${gameName}</b> added to Library`
+        });
+
+        //reset to default
+        this.openTab = 1;
+        this.selectedGameItem = null;
+        this.selectedGameCover = null;
       } catch (error) {
-        console.error(error)
+        toastStore().handleErrorMessage(
+          error,
+          `Something went wrong, Could not add game to library`
+        );
       } finally {
-        this.isLoading = false
+        this.isLoading = false;
       }
+    },
+
+    resetAddGameModal() {
+      this.openTab = 1;
+      this.selectedGameItem = null;
+      this.selectedGameCover = null;
     }
   }
-}
+};
 </script>
 
 <style scoped>
 .container {
-  width: 96vw;
-  height: 91vh;
+  max-width: 96vw;
+  max-height: 92vh;
+  width: 750px;
   padding: 12px 18px;
   overflow-y: scroll;
+
+  @media (max-width: 750px) {
+    width: 96vw;
+    height: 92vh;
+  }
 }
 
 .content {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  max-width: 1200px;
   margin: auto;
+}
+
+.btn-container {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
 }
 
 .heading {

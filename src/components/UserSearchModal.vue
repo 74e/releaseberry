@@ -19,7 +19,7 @@
       </div>
 
       <div class="results-container">
-        <div class="results" v-if="results.length > 0">
+        <div class="results" v-if="results.length > 0 && searchValue">
           <TransitionGroup name="fade" tag="div">
             <UserSearchItem
               v-for="result in sortedResults"
@@ -34,13 +34,13 @@
 </template>
 
 <script>
-import ModalPopup from './uiComponents/ModalPopup.vue'
-import userStore from '@/state/userStore'
-import { mapActions } from 'pinia'
-import UserSearchItem from './UserSearchItem.vue'
+import ModalPopup from './uiComponents/ModalPopup.vue';
+import userStore from '@/state/userStore';
+import { mapActions } from 'pinia';
+import UserSearchItem from './UserSearchItem.vue';
 
 export default {
-  name: 'AuthModalComponent',
+  name: 'UserSearchModal',
 
   components: {
     ModalPopup,
@@ -53,37 +53,42 @@ export default {
     return {
       searchValue: '',
       results: [],
-      searcbTimeout: null
-    }
+      searchTimer: null
+    };
   },
 
   computed: {
     sortedResults() {
-      return this.results.toSorted((a, b) => a.username.length - b.username.length)
+      return this.results.toSorted((a, b) => a.username.length - b.username.length);
     }
+  },
+
+  mounted() {
+    this.focusSearch();
   },
 
   methods: {
     ...mapActions(userStore, ['userSearch']),
 
     close() {
-      this.$refs.modal.hide()
+      this.$refs.modal.hide();
     },
 
     focusSearch() {
-      this.$nextTick(() => {
-        this.$refs.userSearchInput.focus()
-      })
+      this.$refs.userSearchInput.focus();
     },
 
-    async handleUserSearch() {
-      if (!this.searchValue) return
-      const searchResults = await this.userSearch(this.searchValue)
+    handleUserSearch() {
+      clearTimeout(this.searchTimer);
+      if (!this.searchValue) return;
 
-      this.results = searchResults
+      this.searchTimer = setTimeout(async () => {
+        const searchResults = await this.userSearch(this.searchValue);
+        this.results = searchResults;
+      }, 500);
     }
   }
-}
+};
 </script>
 
 <style scoped>

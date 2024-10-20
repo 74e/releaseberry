@@ -21,12 +21,12 @@
 </template>
 
 <script>
-import WindowPopup from './uiComponents/WindowPopup.vue'
+import WindowPopup from './uiComponents/WindowPopup.vue';
 
 // TEMPORARY COMPONENT FOR NOTIFYING USERS ABOUT THE LACK OF PASSWORD RESET FUNCTIONALITY
 
 export default {
-  name: 'UserNoticeComponent',
+  name: 'UserNotice',
 
   components: {
     WindowPopup
@@ -46,33 +46,33 @@ export default {
   data() {
     return {
       windowWidth: window.innerWidth
-    }
+    };
   },
 
   mounted() {
-    window.addEventListener('resize', this.updateWindowSize)
+    window.addEventListener('resize', this.updateWindowSize);
   },
 
   unmounted() {
-    window.removeEventListener('resize', this.updateWindowSize)
+    window.removeEventListener('resize', this.updateWindowSize);
   },
 
   computed: {
     isMobile() {
-      return this.windowWidth > 430
+      return this.windowWidth > 430;
     },
 
     trigger() {
-      return this.isMobile ? 'hover' : 'click'
+      return this.isMobile ? 'hover' : 'click';
     }
   },
 
   methods: {
     updateWindowSize() {
-      this.windowWidth = window.innerWidth
+      this.windowWidth = window.innerWidth;
     }
   }
-}
+};
 </script>
 
 <style scoped>

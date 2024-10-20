@@ -18,9 +18,15 @@
 
 <script>
 export default {
-  name: 'WindowPopupComponent',
+  name: 'WindowPopup',
 
   inject: ['accentColor'],
+
+  provide() {
+    return {
+      hide: this.hide
+    };
+  },
 
   props: {
     width: {
@@ -37,7 +43,7 @@ export default {
       type: String,
       default: 'm',
       validator(value) {
-        return ['s', 'm', 'l'].includes(value)
+        return ['s', 'm', 'l'].includes(value);
       }
     },
 
@@ -45,9 +51,9 @@ export default {
       type: [Array],
       default: () => ['top'],
       validator(value) {
-        return value.every((border) =>
-          ['top', 'bottom', 'right', 'left', 'none'].includes(border)
-        )
+        return value.every((border) => {
+          return ['top', 'bottom', 'right', 'left', 'none', 'faint'].includes(border);
+        });
       }
     },
 
@@ -68,7 +74,7 @@ export default {
           'left-center',
           'left-top',
           'left-bottom'
-        ].includes(value)
+        ].includes(value);
       }
     },
 
@@ -91,7 +97,7 @@ export default {
       type: String,
       default: 'click',
       validator(value) {
-        return ['click', 'hover'].includes(value)
+        return ['click', 'hover'].includes(value);
       }
     },
 
@@ -116,112 +122,118 @@ export default {
       showWindow: false,
       hideTimer: null,
       showTimer: null
-    }
+    };
   },
 
   computed: {
     windowPosition() {
-      let [primary, secondary] = this.position.split('-')
-      let variation = { center: 50, left: 100, right: 0, top: 100, bottom: 0 }
-      let reversePosition = { top: 'bottom', bottom: 'top', right: 'left', left: 'right' }
+      let [primary, secondary] = this.position.split('-');
+      let variation = { center: 50, left: 100, right: 0, top: 100, bottom: 0 };
+      let reversePosition = {
+        top: 'bottom',
+        bottom: 'top',
+        right: 'left',
+        left: 'right'
+      };
 
-      let direction = `${reversePosition[primary]}: calc(100% + ${this.margin}px);`
+      let direction = `${reversePosition[primary]}: calc(100% + ${this.margin}px);`;
       let alignment = ['bottom', 'top'].includes(primary)
         ? `left: ${variation[secondary]}%; transform: translateX(calc(-${variation[secondary]}% + ${this.xShift}px));`
-        : `top: ${variation[secondary]}%; transform: translateY(calc(-${variation[secondary]}% + ${this.yShift}px));`
+        : `top: ${variation[secondary]}%; transform: translateY(calc(-${variation[secondary]}% + ${this.yShift}px));`;
 
-      return `${direction} ${alignment}`
+      return `${direction} ${alignment}`;
     },
 
     borderStyle() {
-      if (this.accentBorders.includes('none')) return ''
+      if (this.accentBorders.includes('none')) return '';
+      if (this.accentBorders.includes('faint')) {
+        return 'border: 1px solid rgba(255, 255, 255, 0.308);';
+      }
 
       return this.accentBorders.reduce((border, selectedBorder) => {
-        return (border += `border-${selectedBorder}: ${this.borderWidth}px solid ${this.accentColor};`)
-      }, '')
+        return (border += `border-${selectedBorder}: ${this.borderWidth}px solid ${this.accentColor};`);
+      }, '');
     },
 
     borderRadiusSize() {
-      return `var(--radius-${this.borderRadius})`
+      return `var(--radius-${this.borderRadius})`;
     }
   },
 
   mounted() {
-    this.initiateComponent()
+    this.initiateComponent();
   },
 
   unmounted() {
     if (this.trigger === 'click') {
-      document.removeEventListener('click', this.handleTriggerOutside)
-      document.removeEventListener('keyup', this.handleEscape)
+      document.removeEventListener('click', this.handleTriggerOutside);
+      document.removeEventListener('keyup', this.handleEscape);
     }
   },
 
   watch: {
     showWindow(newValue) {
       if (newValue && this.trigger === 'click') {
-        this.initiateWindow()
+        this.initiateWindow();
       }
     }
   },
 
   methods: {
     handleTrigger() {
-      this.showWindow ? this.hide() : this.show()
+      this.showWindow ? this.hide() : this.show();
     },
 
-    // I could make show and hide the same function but for
-    // the sake of clarity I'm keeping them seperate.
     show() {
-      clearTimeout(this.showTimer)
+      clearTimeout(this.showTimer);
 
       if (this.hideTimer) {
-        clearTimeout(this.hideTimer)
-        this.hideTimer = null
+        clearTimeout(this.hideTimer);
+        this.hideTimer = null;
       }
 
       this.showTimer = setTimeout(
         () => {
-          this.showWindow = true
+          this.showWindow = true;
         },
         this.trigger === 'click' ? 0 : this.showDelay
-      )
+      );
     },
 
     hide() {
-      clearTimeout(this.hideTimer)
+      clearTimeout(this.hideTimer);
 
       if (this.showTimer) {
-        clearTimeout(this.showTimer)
-        this.showTimer = null
+        clearTimeout(this.showTimer);
+        this.showTimer = null;
       }
 
       this.hideTimer = setTimeout(
         () => {
-          this.showWindow = false
+          this.showWindow = false;
         },
         this.trigger === 'click' ? 0 : this.hideDelay
-      )
+      );
     },
 
     initiateComponent() {
       if (this.trigger === 'click') {
-        this.$refs.trigger.addEventListener('click', this.handleTrigger)
+        this.$refs.trigger.addEventListener('click', this.handleTrigger);
       } else if (this.trigger === 'hover') {
-        this.$refs.trigger.addEventListener('mouseenter', this.show)
-        this.$refs.trigger.addEventListener('mouseleave', this.hide)
+        this.$refs.trigger.addEventListener('mouseenter', this.show);
+        this.$refs.trigger.addEventListener('mouseleave', this.hide);
       }
     },
 
     initiateWindow() {
       if (this.trigger === 'click') {
-        document.addEventListener('click', this.handleTriggerOutside)
-        document.addEventListener('keyup', this.handleEscape)
+        document.addEventListener('click', this.handleTriggerOutside);
+        document.addEventListener('keyup', this.handleEscape);
       }
     },
 
     checkIfTargetOrDecendants(ref, event) {
-      return !ref?.contains(event.target) && ref?.window !== event.target
+      return !ref?.contains(event.target) && ref?.window !== event.target;
     },
 
     handleTriggerOutside(e) {
@@ -229,21 +241,22 @@ export default {
         this.checkIfTargetOrDecendants(this.$refs.window, e) &&
         this.checkIfTargetOrDecendants(this.$refs.trigger, e)
       ) {
-        this.hide()
+        this.hide();
       }
     },
 
     handleEscape(e) {
       if (e.key === 'Escape') {
-        this.hide()
+        this.hide();
       }
     }
   }
-}
+};
 </script>
 
 <style scoped>
 .anchor {
+  width: max-content;
   position: relative;
 }
 
@@ -254,13 +267,13 @@ export default {
   border-radius: v-bind(borderRadiusSize);
   transition: all v-bind(duration) ease-out;
   backdrop-filter: blur(80px);
+  z-index: 999;
 
   @supports (backdrop-filter: blur(80px)) {
     background-color: var(--dark-95);
   }
 
   position: absolute;
-  z-index: 1000;
 }
 
 .fade-enter-from,

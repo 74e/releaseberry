@@ -2,7 +2,9 @@
 
 :root {
   --main-bg-color: #0f0f0f;
+  --dark-40: rgba(31, 31, 41, 0.45);
   --dark-50: rgba(31, 31, 41, 0.65);
+  --dark-70: rgba(31, 31, 41, 0.75);
   --dark-85: rgba(24, 24, 32, 0.85);
   --dark-95: rgba(24, 24, 32, 0.95);
   --dark-100: rgba(24, 24, 32, 1);
@@ -19,6 +21,7 @@
 
   --radius-l: 12px;
   --radius-m: 8px;
+  --radius-sm: 6px;
   --radius-s: 4px;
 
   --shadow-default: 0px 8px 11.1px rgba(0, 0, 0, 0.25);
@@ -71,4 +74,8 @@ a {
 
 #app {
   min-height: 100vh;
+}
+
+.checking {
+  width: 100%;
 }

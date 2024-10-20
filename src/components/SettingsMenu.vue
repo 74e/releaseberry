@@ -30,23 +30,23 @@
 </template>
 
 <script>
-import WindowPopup from './uiComponents/WindowPopup.vue'
-import userStore from '@/state/userStore'
-import { mapState, mapActions } from 'pinia'
+import WindowPopup from './uiComponents/WindowPopup.vue';
+import userStore from '@/state/userStore';
+import { mapState, mapActions } from 'pinia';
 
 export default {
-  name: 'SettingsMenuComponent',
+  name: 'SettingsMenu',
 
   components: {
     WindowPopup
   },
 
   mounted() {
-    window.addEventListener('resize', this.updateWindowSize)
+    window.addEventListener('resize', this.updateWindowSize);
   },
 
   unmounted() {
-    window.removeEventListener('resize', this.updateWindowSize)
+    window.removeEventListener('resize', this.updateWindowSize);
   },
 
   data() {
@@ -54,26 +54,26 @@ export default {
       showSettings: false,
       windowWidth: window.innerWidth,
       windowHeight: window.innerHeight
-    }
+    };
   },
 
   computed: {
     ...mapState(userStore, ['loggedInUser']),
 
     isMenuShifted() {
-      return this.windowWidth > 1050 && this.windowHeight > 750
+      return this.windowWidth > 750;
     },
 
     windowPosition() {
-      return this.isMenuShifted ? 'right-bottom' : 'top-left'
+      return this.isMenuShifted ? 'right-bottom' : 'top-left';
     },
 
     borderStyle() {
-      return this.isMenuShifted ? 'left' : 'bottom'
+      return this.isMenuShifted ? 'left' : 'bottom';
     },
 
     margin() {
-      return this.isMenuShifted ? 12 : 28
+      return this.isMenuShifted ? 12 : 28;
     }
   },
 
@@ -81,25 +81,25 @@ export default {
     ...mapActions(userStore, ['logout']),
 
     openModal() {
-      this.$emit('openModal')
+      this.$emit('openModal');
 
       // Close the the window/popup from here (aka parent component)
-      this.$refs.window.showWindow = false
+      this.$refs.window.showWindow = false;
     },
 
     logoutActions() {
-      this.logout()
-      this.$refs.window.showWindow = false
+      this.logout();
+      this.$refs.window.showWindow = false;
 
-      this.$router.push('/')
+      this.$router.push('/');
     },
 
     updateWindowSize() {
-      this.windowWidth = window.innerWidth
-      this.windowHeight = window.innerHeight
+      this.windowWidth = window.innerWidth;
+      this.windowHeight = window.innerHeight;
     }
   }
-}
+};
 </script>
 
 <style scoped>

@@ -8,12 +8,12 @@
 </template>
 
 <script>
-import ModalPopup from './ModalPopup.vue'
-import LoginForm from '../LoginForm.vue'
-import CreateAccountForm from '../CreateAccountForm.vue'
+import ModalPopup from './uiComponents/ModalPopup.vue';
+import LoginForm from './LoginForm.vue';
+import CreateAccountForm from './CreateAccountForm.vue';
 
 export default {
-  name: 'AuthModalComponent',
+  name: 'AuthModal',
 
   components: {
     ModalPopup,
@@ -24,15 +24,15 @@ export default {
   data() {
     return {
       showLogin: true
-    }
+    };
   },
 
   methods: {
     switchWindowContent() {
-      this.showLogin = !this.showLogin
+      this.showLogin = !this.showLogin;
     }
   }
-}
+};
 </script>
 
 <style scoped></style>

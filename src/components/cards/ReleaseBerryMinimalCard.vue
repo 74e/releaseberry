@@ -2,6 +2,7 @@
   <div
     :class="[
       'card-default-minimal',
+      { enter: isLoaded.trigger, 'y-slide': ySlide },
       showBackdrop ? 'card-backdrop' : 'no-backdrop-space'
     ]"
   >
@@ -15,6 +16,7 @@
         <timerDisplay
           class="timer"
           :counterFormat="this.counterFormat"
+          :createdAt="createdAt"
           :releaseDate="releaseDate"
         />
       </div>
@@ -23,9 +25,10 @@
 </template>
 
 <script>
-import colorStore from '@/state/accentColor'
-import { mapActions } from 'pinia'
-import timerDisplay from '@/components/TimerDisplay.vue'
+import colorStore from '@/state/colorStore';
+import { mapActions } from 'pinia';
+import timerDisplay from '@/components/TimerDisplay.vue';
+import { LoadImageInitTrigger } from '../../helperFunctions/common';
 
 export default {
   name: 'ReleaseBerryMinimalCard',
@@ -43,112 +46,127 @@ export default {
     cardData: {
       type: [Object, null],
       default: null
+    },
+
+    ySlide: {
+      type: Boolean,
+      default: true
     }
+  },
+
+  mounted() {
+    LoadImageInitTrigger(this.gameCover, this.isLoaded);
   },
 
   computed: {
     cardTitle() {
-      return this.gameData.name
+      return this.gameData.name;
     },
 
     gameCover() {
-      return this.gameData.cover_url
+      return this.gameData.cover_url;
     },
 
     counterFormat() {
-      return this.cardData.countdown_format
+      return this.cardData.countdown_format;
+    },
+
+    createdAt() {
+      return this.cardData?.created_at;
     },
 
     styleSettings() {
-      return this.cardData.config
+      return this.cardData.config;
     },
 
     releaseDate() {
-      return Number(this.gameData.release_date)
+      return this.gameData.release_date;
     },
 
     showTitle() {
-      return this.styleSettings.displaySettings.showTitle.value
+      return this.styleSettings.displaySettings.showTitle.value;
     },
 
     showBackdrop() {
-      return this.styleSettings.displaySettings.showBackdrop.value
+      return this.styleSettings.displaySettings.showBackdrop.value;
     },
 
     backgroundTintOne() {
-      const { value } = this.styleSettings.cardBackground.gradientColorOne
-      return this.stringifyRGBA(value)
+      const { value } = this.styleSettings.cardBackground.gradientColorOne;
+      return this.stringifyRGBA(value);
     },
 
     backgroundTintTwo() {
-      const { value } = this.styleSettings.cardBackground.gradientColorTwo
-      return this.stringifyRGBA(value)
+      const { value } = this.styleSettings.cardBackground.gradientColorTwo;
+      return this.stringifyRGBA(value);
     },
 
     backgroundGradientDirection() {
-      const { value } = this.styleSettings.cardBackground.gradientDirection
-      return `${value}deg`
+      const { value } = this.styleSettings.cardBackground.gradientDirection;
+      return `${value}deg`;
     },
 
     backdropTintOne() {
-      const { value } = this.styleSettings.backdrop.gradientColorOne
-      return this.stringifyRGBA(value)
+      const { value } = this.styleSettings.backdrop.gradientColorOne;
+      return this.stringifyRGBA(value);
     },
 
     backdropTintTwo() {
-      const { value } = this.styleSettings.backdrop.gradientColorTwo
-      return this.stringifyRGBA(value)
+      const { value } = this.styleSettings.backdrop.gradientColorTwo;
+      return this.stringifyRGBA(value);
     },
 
     backdropGradientDirection() {
-      const { value } = this.styleSettings.backdrop.gradientDirection
-      return `${value}deg`
+      const { value } = this.styleSettings.backdrop.gradientDirection;
+      return `${value}deg`;
     },
 
     titleFontColor() {
-      const { value } = this.styleSettings.cardProperties.titleColor
-      return this.stringifyRGBA(value)
+      const { value } = this.styleSettings.cardProperties.titleColor;
+      return this.stringifyRGBA(value);
     },
 
     timerFontColor() {
-      const { value } = this.styleSettings.cardProperties.counterColor
-      return this.stringifyRGBA(value)
+      const { value } = this.styleSettings.cardProperties.counterColor;
+      return this.stringifyRGBA(value);
     },
 
     borderAccent() {
-      const { value } = this.styleSettings.backdrop.innerBorderColor
-      return this.stringifyRGBA(value)
+      const { value } = this.styleSettings.backdrop.innerBorderColor;
+      return this.stringifyRGBA(value);
     },
 
     fakeDepthColor() {
-      const { value } = this.styleSettings.cardProperties.thicknessColor
-      return this.stringifyRGBA(value)
+      const { value } = this.styleSettings.cardProperties.thicknessColor;
+      return this.stringifyRGBA(value);
     },
 
     borderColor() {
-      const { value } = this.styleSettings.cardProperties.borderColor
-      return this.stringifyRGBA(value)
+      const { value } = this.styleSettings.cardProperties.borderColor;
+      return this.stringifyRGBA(value);
     },
 
     fakeDepthWidth() {
-      const { value } = this.styleSettings.cardProperties.thickness
-      return `${value}px`
+      const { value } = this.styleSettings.cardProperties.thickness;
+      return `${value}px`;
     }
   },
 
   data() {
-    return {}
+    return {
+      isLoaded: { trigger: false }
+    };
   },
 
   methods: {
     ...mapActions(colorStore, ['setDefaultColor', 'setNewColor']),
 
     stringifyRGBA(colorValues) {
-      const [R, G, B, A] = colorValues
-      return `rgba(${R},${G},${B},${A})`
+      const [R, G, B, A] = colorValues;
+      return `rgba(${R},${G},${B},${A})`;
     }
   }
-}
+};
 </script>
 
 <style scoped>
@@ -156,9 +174,22 @@ export default {
   width: 200px;
   position: relative;
   padding: 12px 14px;
+  user-select: none;
 
-  /* z-index set to inherit, fix so the cards dont overlap other things*/
-  z-index: inherit;
+  opacity: 0;
+  transition:
+    opacity 750ms ease-out,
+    transform 750ms ease-out;
+
+  &.y-slide {
+    transform: translateY(6px);
+  }
+
+  &.enter {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
 
   &.card-backdrop {
     background: linear-gradient(
@@ -182,14 +213,9 @@ export default {
 
   .image-container {
     border: 1px solid v-bind(borderColor);
-
     border-radius: var(--radius-s) var(--radius-s) 0 0;
     overflow: hidden;
     position: relative;
-
-    img {
-      border-radius: var(--radius-s) var(--radius-s) 0 0;
-    }
 
     &::before {
       content: '';

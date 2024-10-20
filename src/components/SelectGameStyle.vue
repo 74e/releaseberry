@@ -9,15 +9,15 @@
           </div>
 
           <component
-            :is="card.component"
+            :is="card.card_component"
             :gameData="gameData"
             :cardData="cardData"
-            :key="card.component"
+            :key="card.card_component"
           />
         </div>
 
         <DropDown
-          label="Relase Counter Format"
+          label="Release Counter Format"
           labelPosition="center"
           :dropdownCount="2"
           v-model:selectedValue="counterFormat"
@@ -36,14 +36,19 @@
 
             <DropDown
               label="Design Preset"
-              targetValue="name"
-              v-model:selectedValue="selectedPreset"
+              targetDisplay="name"
+              targetIdentifier="id"
+              v-model:selectedValue="selectedConfig"
               :optionValues="availablePresets"
             />
           </div>
-          <ButtonFancyComponent class="show-edit-btn" @click="handleEditVisibility(true)">
+          <ButtonComponent
+            :disabled="noneEditableCard"
+            class="show-edit-btn"
+            @click="handleEditVisibility(true)"
+          >
             Create custom preset
-          </ButtonFancyComponent>
+          </ButtonComponent>
         </div>
 
         <div v-else class="settings-container" ref="styleContainer">
@@ -64,61 +69,24 @@
         </div>
       </Transition>
     </div>
-
-    <div class="btn-container">
-      <ButtonComponent @click="handleProgression('previous')">Back</ButtonComponent>
-      <ButtonComponent @click="handleConfirm">Confirm</ButtonComponent>
-    </div>
   </div>
 </template>
 
-<!--
-TODO:
-      WHAT NEEDS FIXING?
-        work on the backend
-
-
-      The cardstyle logic in the backend needs to have 2 tables
-      One has the card, every entry represents a card type, it contains the
-      card structure config (ie, what component to use and restrictions)
-      the id from the card type will be used as a reference for the presets.
-      So its going to be a many to one relation where all presets link to the card type the preset is for
-      For validation of the card data:
-        The card type config will be used to check if the structure is the same
-        and that the values are valid in both type and restriction.
-      How to deal with duplicates/determine that a preset is being used:
-        when sending an existing preset then send along preset id, from there
-        compare the presets with JSON.stringify to check validity.
-        If no id is sent along proceed to add preset to database
-      In short, the frontend needs to send:
-        card type id so I know which card the preset is for
-        preset id to determine that a preset is used
-        if no id: save preset data as a new entry
-
-      FIX PRESET RENAME BUG WITH DROPDOWN
-
-      Remove save button because the backend will save the preset no matter what anyways
-
-      Future stretch goal:
-        Palettes: Use config structure to determine where generated color should be added
--->
-
 <script>
-import cardConfigPresets from '../assets/styleSettings/defaultPresetsAndSettings.js'
-import PresetTemplateRender from './PresetTemplateRender.vue'
-import DropDown from './uiComponents/DropDown.vue'
-import injectTemplateConfig from '../helperFunctions/templateConfig'
-import ButtonComponent from './primitiveComponents/ButtonComponent.vue'
-import ButtonFancyComponent from './primitiveComponents/ButtonFancyComponent.vue'
+import PresetTemplateRender from './PresetTemplateRender.vue';
+import DropDown from './uiComponents/DropDown.vue';
+import ButtonComponent from './ButtonComponent.vue';
+import cardStore from '@/state/cardStore';
+import userStore from '@/state/userStore';
+import { mapActions, mapState } from 'pinia';
 
 export default {
-  name: 'SelectGameStyleComponent',
+  name: 'SelectGameStyle',
 
   components: {
     DropDown,
     PresetTemplateRender,
-    ButtonComponent,
-    ButtonFancyComponent
+    ButtonComponent
   },
 
   props: {
@@ -133,10 +101,11 @@ export default {
     }
   },
 
-  inject: ['handleProgression', 'accentColor'],
+  inject: ['accentColor'],
 
   mounted() {
-    this.initialize()
+    this.initialize();
+    console.log(this.selectedGameCover);
   },
 
   data() {
@@ -159,12 +128,9 @@ export default {
         'FULL DATE'
       ],
 
-      // Deep copy for cardConfigPresets
-      editableCardConfigPresets: null,
-
       // Strings to determine which card and preset is selected
       selectedCardName: null,
-      selectedPreset: null, // has name and id
+      selectedConfig: null, // has name and id
 
       // Objects containing data
       selectedPresetSettings: null,
@@ -175,136 +141,145 @@ export default {
 
       // error handling for preset
       noNameError: false,
-      noNameTimeout: null
-    }
+      noNameTimeout: null,
+
+      cardConfigCopy: null
+    };
   },
 
   watch: {
     selectedCardName() {
       // Selects the first preset
-      const { name, id } = this.card.presets[0]
-      this.selectedPreset = { name, id }
+      const { config, id } = this.card.card_config[0];
+      this.selectedConfig = { name: config.name, id };
 
-      this.resetDefaultCardConfig()
+      this.resetDefaultCardConfig();
     },
 
-    selectedPreset() {
-      this.resetDefaultCardConfig()
+    selectedConfig() {
+      this.resetDefaultCardConfig();
     }
   },
 
   computed: {
-    card() {
-      for (const name in cardConfigPresets) {
-        if (cardConfigPresets[name].name === this.selectedCardName) {
-          return this.editableCardConfigPresets[name]
-        }
-      }
+    ...mapState(userStore, ['loggedInUser']),
+    ...mapState(cardStore, ['userCardConfigs']),
 
-      return null
+    card() {
+      return this.cardConfigCopy?.find(
+        (card) => card.card_name === this.selectedCardName
+      );
     },
 
     availableCardOptions() {
-      let cardNames = []
+      return this.cardConfigCopy.map((card) => card.card_name);
+    },
 
-      for (const name in cardConfigPresets) {
-        cardNames.push(cardConfigPresets[name].name)
-      }
-
-      return cardNames
+    noneEditableCard() {
+      return ['Release Berry Plain'].includes(this.selectedCardName);
     },
 
     isEditing() {
-      return (
-        JSON.stringify(this.editableCardConfigPresets) !==
-        JSON.stringify(cardConfigPresets)
-      )
+      return JSON.stringify(this.userCardConfigs) !== JSON.stringify(this.cardConfigCopy);
     },
 
     gameData() {
-      const time = Date.now()
-      const arbitraryFutureDate = 39689946000
+      const time = Date.now();
+      const arbitraryFutureDate = 39689946000;
 
       return {
         name: this.selectedGameItem.name,
         cover_url: this.selectedGameCover.url,
         release_date: time + arbitraryFutureDate
-      }
+      };
     },
 
     cardData() {
       return {
         countdown_format: this.counterFormat,
-        config: this.selectedPresetSettings
-      }
+        config: this.selectedPresetSettings.config
+      };
     }
   },
 
   methods: {
-    initialize() {
-      injectTemplateConfig(cardConfigPresets)
-      this.editableCardConfigPresets = structuredClone(cardConfigPresets)
+    ...mapActions(cardStore, ['getConfigCopy']),
 
-      this.counterFormat = this.availableTimerFormats[0]
+    async initialize() {
+      this.cardConfigCopy = this.getConfigCopy();
 
-      const { name, presets } = this.editableCardConfigPresets.releaseBerryStandard
-      this.selectedCardName = name
-      this.selectedPreset = { name: presets[0].name, id: presets[0].id }
+      this.counterFormat = this.availableTimerFormats[0];
 
-      this.isInitialized = true
+      const { card_name, card_config } = this.cardConfigCopy[0];
+      this.selectedCardName = card_name;
+      this.selectedConfig = { name: card_config[0].config.name, id: card_config[0].id };
+
+      this.isInitialized = true;
     },
 
     resetDefaultCardConfig() {
-      this.editableCardConfigPresets = structuredClone(cardConfigPresets)
+      // This is to reset any data that might have been edited
+      // (As in someone edits a config and then switches)
+      this.cardConfigCopy = this.getConfigCopy();
 
-      this.selectedPresetSettings = this.card.presets.find((preset) => {
-        return preset.id === this.selectedPreset.id
-      })
+      // Setting the editable config to selectedPresetSettings and then
+      // sending it to rendering
+      this.selectedPresetSettings = this.card.card_config.find((preset) => {
+        return preset.id === this.selectedConfig.id;
+      });
 
-      this.availablePresets = this.card.presets.map((preset) => ({
-        name: preset.name,
-        id: preset.id
-      }))
+      // Get the new cards styles configs
+      this.availablePresets = this.card.card_config.map((cardConfig) => ({
+        name: cardConfig.config.name,
+        id: cardConfig.id
+      }));
 
-      this.showEditArea = false
-      this.newPresetName = ''
+      this.showEditArea = false;
+      this.newPresetName = '';
     },
 
     async handleConfirm() {
       const gameData = {
         appid: this.selectedGameItem.appid,
         gameCover: this.selectedGameCover
-      }
+      };
 
-      let cardData
+      let cardData;
 
       if (this.isEditing) {
         if (!this.newPresetName) {
-          this.$refs.styleContainer.scrollTo({ top: 0, behavior: 'smooth' })
-          this.noNameError = true
+          this.$refs.styleContainer.scrollTo({ top: 0, behavior: 'smooth' });
+          this.noNameError = true;
 
-          return
+          return;
         }
 
         cardData = {
-          ...this.selectedPresetSettings,
+          card_config: {
+            ...this.selectedPresetSettings.config,
+            name: this.newPresetName
+          },
           id: null,
-          countdownFormat: this.counterFormat,
-          cardComponent: this.card.component,
-          name: this.newPresetName
-        }
+          countdown_format: this.counterFormat,
+          card_component: this.card.card_component,
+          card_name: this.card.card_name
+        };
       } else {
-        cardData = { id: this.selectedPreset.id, cardComponent: this.card.component }
+        cardData = {
+          id: this.selectedConfig.id,
+          card_component: this.card.component,
+          countdown_format: this.counterFormat
+        };
       }
 
-      this.$emit('handleConfirmation', { cardData, gameData })
+      return { payload: { cardData, gameData }, gameName: this.selectedGameItem.name };
     },
 
     handleEditVisibility(value) {
-      this.showEditArea = value
+      this.showEditArea = value;
     }
   }
-}
+};
 </script>
 
 <style scoped>
@@ -335,9 +310,10 @@ export default {
     height: 460px;
   }
 
-  @media (max-height: 785px), (max-width: 785px) {
+  @media (max-height: 785px), (max-width: 1240px) {
     height: auto;
     flex-direction: column;
+    gap: 0px;
   }
 }
 
@@ -346,7 +322,7 @@ export default {
   padding: 16px;
   align-content: center;
 
-  @media (max-width: 785px) {
+  @media (max-width: 1240px) {
     flex-direction: column;
     width: 100%;
   }
@@ -361,6 +337,7 @@ export default {
   overflow-y: scroll;
   width: 600px;
   padding: 16px;
+  margin: auto;
 
   @media (max-width: 785px) {
     overflow-y: auto;
@@ -406,13 +383,13 @@ export default {
   top: 4px;
   right: 8px;
   color: rgba(255, 255, 255, 0.226);
-  transition: color 0.2s ease-in;
+  transition: color 0.2s ease-out;
   display: flex;
   align-items: center;
 
   span {
     opacity: 0;
-    transition: opacity 0.2s ease-in;
+    transition: opacity 0.2s ease-out;
     font-size: 14px;
     display: inline-block;
     margin-right: 6px;
@@ -449,7 +426,7 @@ export default {
     bottom: 100%;
     margin: 0 0 4px 4px;
     opacity: 0;
-    transition: color 0.3s ease-in;
+    transition: color 0.3s ease-out;
   }
 
   input {
@@ -463,12 +440,7 @@ export default {
     border-radius: 6px;
     box-shadow: var(--shadow-default);
     outline: none;
-    transition: border-color 0.3s ease-in;
+    transition: border-color 0.3s ease-out;
   }
-}
-
-.btn-container {
-  display: flex;
-  justify-content: end;
 }
 </style>

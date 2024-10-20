@@ -7,19 +7,17 @@
 
       <div class="profile-details">
         <h2>{{ item.username }}</h2>
-        <span>@{{ item.username }}</span>
+        <span>@{{ item.handle }}</span>
       </div>
     </div>
   </RouterLink>
 </template>
 
 <script>
-import temporaryAvatars from '@/assets/temporaryAvatars'
-
 export default {
-  name: 'UserSearchItemComponent',
+  name: 'UserSearchItem',
 
-  inject: ['hide'],
+  inject: ['hide', 'profileImages'],
 
   props: {
     item: {
@@ -30,11 +28,10 @@ export default {
 
   computed: {
     profileImage() {
-      const randomPick = Math.floor(Math.random() * 12) + 1
-      return temporaryAvatars[randomPick]
+      return this.profileImages[this.item.image_index];
     }
   }
-}
+};
 </script>
 
 <style scoped>

@@ -30,12 +30,12 @@
 </template>
 
 <script>
-import UserNotice from './UserNotice.vue'
-import userStore from '../state/userStore.js'
-import { mapActions } from 'pinia'
+import UserNotice from './UserNotice.vue';
+import userStore from '../state/userStore.js';
+import { mapActions } from 'pinia';
 
 export default {
-  name: 'VerificationFormItemComponent',
+  name: 'VerificationFormItem',
 
   components: {
     UserNotice
@@ -76,7 +76,7 @@ export default {
       type: String,
       default: 'text',
       validator(value) {
-        return ['text', 'email', 'password'].includes(value)
+        return ['text', 'email', 'password'].includes(value);
       }
     },
 
@@ -102,12 +102,12 @@ export default {
     return {
       inputTimeout: null,
       errorInput: ''
-    }
+    };
   },
 
   watch: {
     inputValue() {
-      this.validateInput()
+      this.validateInput();
     }
   },
 
@@ -115,11 +115,11 @@ export default {
     successMessage() {
       switch (this.verificationName) {
         case 'password':
-          return 'Valid password'
+          return 'Valid password';
         case 'confirmPassword':
-          return 'Passwords match'
+          return 'Passwords match';
         default:
-          return `${this.label} available`
+          return `${this.label} available`;
       }
     }
   },
@@ -128,75 +128,75 @@ export default {
     ...mapActions(userStore, ['handleTakenValidation', 'emailTakenValidation']),
 
     updateInputValue(e) {
-      this.$emit('update:inputValue', e.target.value)
+      this.$emit('update:inputValue', e.target.value);
     },
 
     validateInput() {
       if (this.verificationName === 'handle') {
-        this.verify(this.handleTakenValidation)
+        this.verify(this.handleTakenValidation);
       } else if (this.verificationName === 'email') {
-        this.verify(this.emailTakenValidation)
+        this.verify(this.emailTakenValidation);
       } else if (this.verificationName === 'username') {
-        this.matchRegexPattern()
+        this.matchRegexPattern();
       } else if (this.verificationName === 'password') {
-        this.matchRegexPattern()
+        this.matchRegexPattern();
       } else if (this.verificationName === 'confirmPassword') {
-        this.matchStringPattern()
+        this.matchStringPattern();
       }
     },
 
     async verify(validationFunction) {
-      this.errorInput = ''
-      if (!this.inputValue) return
+      this.errorInput = '';
+      if (!this.inputValue) return;
 
-      clearTimeout(this.inputTimeout)
-      this.$emit('update:isLoading', true)
-      this.$emit('update:isValid', false)
+      clearTimeout(this.inputTimeout);
+      this.$emit('update:isLoading', true);
+      this.$emit('update:isValid', false);
 
       this.inputTimeout = setTimeout(async () => {
         try {
-          await validationFunction(this.inputValue)
-          this.$emit('update:isValid', true)
+          await validationFunction(this.inputValue);
+          this.$emit('update:isValid', true);
         } catch (error) {
-          this.errorInput = error.response.data.error
-          this.$emit('update:isValid', false)
+          this.errorInput = error.response.data.error;
+          this.$emit('update:isValid', false);
         } finally {
-          this.$emit('update:isLoading', false)
+          this.$emit('update:isLoading', false);
         }
-      }, 500)
+      }, 500);
     },
 
     matchRegexPattern() {
-      clearTimeout(this.inputTimeout)
-      this.errorInput = ''
+      clearTimeout(this.inputTimeout);
+      this.errorInput = '';
 
       this.inputTimeout = setTimeout(() => {
         if (this.pattern.test(this.inputValue)) {
-          this.$emit('update:isValid', true)
-          return
+          this.$emit('update:isValid', true);
+          return;
         }
 
-        this.errorInput = this.error
-        this.$emit('update:isValid', false)
-      }, 900)
+        this.errorInput = this.error;
+        this.$emit('update:isValid', false);
+      }, 900);
     },
 
     matchStringPattern() {
-      clearTimeout(this.inputTimeout)
-      this.errorInput = ''
+      clearTimeout(this.inputTimeout);
+      this.errorInput = '';
 
       this.inputTimeout = setTimeout(() => {
         if (this.pattern === this.inputValue) {
-          this.$emit('update:isValid', true)
-          return
+          this.$emit('update:isValid', true);
+          return;
         }
 
-        this.errorInput = this.error
-        this.$emit('update:isValid', false)
-      }, 500)
+        this.errorInput = this.error;
+        this.$emit('update:isValid', false);
+      }, 500);
     }
   }
-}
+};
 </script>
 
 <style scoped>

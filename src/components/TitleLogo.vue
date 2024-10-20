@@ -2,15 +2,22 @@
   <div class="releaseberry-logo-container">
     <h1 class="releaseberry-logo fancy-text">RELEASE BERRY</h1>
     <ReleaseBerryIcon />
+    <span v-if="global" class="global fancy-text">Global Library</span>
   </div>
 </template>
 
 <script>
 export default {
-  name: 'TitleLogoComponent',
+  name: 'TitleLogo',
+
+  props: {
+    global: {
+      default: false
+    }
+  },
 
   inject: ['accentColor', 'backgroundColor', 'backgroundPosition', 'duration']
-}
+};
 </script>
 
 <style scoped>
@@ -19,6 +26,7 @@ export default {
   margin: auto;
   margin-bottom: 40px;
 
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -36,8 +44,18 @@ export default {
     transform: rotate(34.14deg) translate(5px, -4px);
   }
 
+  .global {
+    margin: auto;
+    display: inline-block;
+    position: absolute;
+    top: calc(100% + 2px);
+    font-size: 19px;
+    font-weight: bold;
+    opacity: 0.85;
+  }
+
   @media (max-width: 500px) {
-    margin-bottom: 16px;
+    margin-bottom: 24px;
 
     .releaseberry-logo {
       font-size: 36px;
@@ -46,6 +64,11 @@ export default {
 
     .releaseberry-icon {
       display: none;
+    }
+
+    .global {
+      top: 95%;
+      font-size: 16px;
     }
   }
 

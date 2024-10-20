@@ -1,11 +1,14 @@
 <template>
-  <div v-if="preset">
+  <div class="render-container" v-if="preset">
     <div
-      :class="['property-section', { individual: isComponent(property) }]"
-      v-for="(property, key) in presetCopy"
+      :class="[
+        'property-section',
+        { individual: isComponent(property), top: key === 'displaySettings' }
+      ]"
+      v-for="(property, key) in configCopy"
       :key="key"
     >
-      <span class="property-label">{{ convertToWords(key) }}</span>
+      <span class="property-label">{{ camelCaseToWords(key) }}</span>
       <div class="property">
         <template v-if="isComponent(property)">
           <component
@@ -22,7 +25,7 @@
                 { toggle: nestedProperty.componentType === 'ToggleInput' }
               ]"
             >
-              <span class="sub-property-label">{{ convertToWords(nestedKey) }}</span>
+              <span class="sub-property-label">{{ camelCaseToWords(nestedKey) }}</span>
               <component
                 :is="nestedProperty.componentType"
                 :orignialObj="nestedProperty"
@@ -37,13 +40,13 @@
 </template>
 
 <script>
-import camelCaseToWords from '../helperFunctions/camelCaseToWords'
-import ColorPicker from './uiComponents/ColorPicker.vue'
-import SliderInput from './uiComponents/SliderInput.vue'
-import ToggleInput from './uiComponents/ToggleInput.vue'
+import { camelCaseToWords } from '../helperFunctions/common';
+import ColorPicker from './uiComponents/ColorPicker.vue';
+import SliderInput from './uiComponents/SliderInput.vue';
+import ToggleInput from './uiComponents/ToggleInput.vue';
 
 export default {
-  name: 'PresetTemplateRenderComponent',
+  name: 'PresetTemplateRender',
 
   components: {
     ColorPicker,
@@ -59,48 +62,51 @@ export default {
   },
 
   mounted() {
-    this.copyPreset()
+    this.copyPreset();
   },
 
   data() {
     return {
       name: null,
-      presetCopy: {}
-    }
+      configCopy: {}
+    };
   },
 
   watch: {
     preset() {
-      this.copyPreset()
+      this.copyPreset();
     }
   },
 
   methods: {
+    camelCaseToWords,
+
     isComponent(obj) {
-      return Object.keys(obj).some((property) => property === 'componentType')
+      return Object.keys(obj).some((property) => property === 'componentType');
     },
 
     isSliderObj(obj) {
-      return obj.componentType === 'SilderInput' ? obj : obj.value
+      return obj.componentType === 'SilderInput' ? obj : obj.value;
     },
 
     copyPreset() {
       /* eslint-disable no-unused-vars */
-      const { id, name, ...preset } = this.preset
+      const { name, ...preset } = this.preset.config;
       /* eslint-enable no-unused-vars */
 
-      this.name = name
-      this.presetCopy = preset
-    },
-
-    convertToWords(value) {
-      return camelCaseToWords(value)
+      this.name = name;
+      this.configCopy = preset;
     }
   }
-}
+};
 </script>
 
 <style scoped>
+.render-container {
+  display: flex;
+  flex-direction: column;
+}
+
 .property-section {
   padding: 6px 12px;
   border: 1px solid rgba(255, 255, 255, 0.123);
@@ -115,17 +121,29 @@ export default {
     display: flex;
     align-items: center;
   }
+
+  &.top {
+    order: -1;
+  }
 }
 
 .property {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
   padding: 8px 0 8px 8px;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
 }
 
 .sub-property {
+  position: relative;
+  margin-top: 18px;
+
   .sub-property-label {
+    display: inline-block;
+    position: absolute;
+    bottom: 100%;
+    width: max-content;
     font-size: 15px;
     display: block;
     margin: 0 0 2px 12px;
@@ -135,9 +153,11 @@ export default {
   &.toggle {
     display: flex;
     align-items: center;
+    margin: 0;
 
     .sub-property-label {
       font-size: 15px;
+      position: static;
       display: block;
       margin: 0 6px 0 8px;
     }

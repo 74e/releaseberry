@@ -4,7 +4,9 @@
       <WindowPopup position="bottom-right">
         <ListIcon />
 
-        <template #window> testing text for window </template>
+        <template #window>
+          <GameListMenu />
+        </template>
       </WindowPopup>
     </div>
 
@@ -12,13 +14,22 @@
       <Transition name="fade" mode="out-in">
         <component @click="toggleSearchField" :is="searchIcon" />
       </Transition>
-      <!-- <FilterIcon /> TODO ADD FILTER FUNCTION -->
-      <WindowPopup position="left-center">
-        <ThemeIcon />
-        <template #window> testing text for window </template>
+
+      <WindowPopup>
+        <FilterIcon />
+        <template #window>
+          <LibraryFilterMenu />
+        </template>
       </WindowPopup>
 
-      <LayoutIcon />
+      <WindowPopup>
+        <LayoutIcon />
+        <template #window>
+          <div style="padding: 16px; width: 150px; text-align: center">
+            Layout settings coming soon
+          </div>
+        </template>
+      </WindowPopup>
 
       <button @click="toggleAddGameModal" class="add-title-btn">
         <PlusIcon />
@@ -27,26 +38,32 @@
     </div>
   </div>
 
-  <SearchField
+  <ToolBarSearchField
     :showSearchField="showSearchField"
     @search="search"
     @toggle-search-field="toggleSearchField"
   />
-  <AddGameModal v-model:showModal="showAddGameModal" />
+  <Transition name="fade">
+    <AddGameModal v-if="showAddGameModal" v-model:showModal="showAddGameModal" />
+  </Transition>
 </template>
 
 <script>
-import SearchField from './SearchField.vue'
-import WindowPopup from './uiComponents/WindowPopup.vue'
-import AddGameModal from './AddGameModal.vue'
+import ToolBarSearchField from './ToolBarSearchField.vue';
+import WindowPopup from './uiComponents/WindowPopup.vue';
+import LibraryFilterMenu from './LibraryFilterMenu.vue';
+import GameListMenu from './GameListMenu.vue';
+import AddGameModal from './AddGameModal.vue';
 
 export default {
-  name: 'CardToolbarComponent',
+  name: 'CardToolbar',
 
   components: {
-    SearchField,
+    ToolBarSearchField,
     WindowPopup,
-    AddGameModal
+    AddGameModal,
+    GameListMenu,
+    LibraryFilterMenu
   },
 
   inject: ['accentColor', 'backgroundColor', 'backgroundPosition', 'duration'],
@@ -55,29 +72,29 @@ export default {
     return {
       showSearchField: false,
       showAddGameModal: false
-    }
+    };
   },
 
   computed: {
     searchIcon() {
-      return this.showSearchField ? 'CloseIcon' : 'SearchIcon'
+      return this.showSearchField ? 'CloseIcon' : 'SearchIcon';
     }
   },
 
   methods: {
     toggleSearchField() {
-      this.showSearchField = !this.showSearchField
+      this.showSearchField = !this.showSearchField;
     },
 
     toggleAddGameModal() {
-      this.showAddGameModal = !this.showAddGameModal
+      this.showAddGameModal = !this.showAddGameModal;
     },
 
     search(query) {
-      console.log(query, 'searching')
+      console.log(query, 'searching');
     }
   }
-}
+};
 </script>
 
 <style scoped>
@@ -87,6 +104,7 @@ export default {
   height: 50px;
   margin: auto;
   padding: 0 14px;
+  z-index: 1;
 
   background-color: var(--dark-50);
   box-shadow: var(--shadow-default);

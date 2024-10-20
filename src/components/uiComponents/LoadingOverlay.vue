@@ -22,7 +22,7 @@
 
 <script>
 export default {
-  name: 'LoadingOverlayComponent',
+  name: 'LoadingOverlay',
 
   inject: ['accentColor'],
 
@@ -51,14 +51,14 @@ export default {
   methods: {
     cubeSize(dimensionType) {
       if (this.cubeDimensions.includes(' ')) {
-        const index = ['width', 'height'].indexOf(dimensionType)
-        return this.cubeDimensions?.split(' ')[index]
+        const index = ['width', 'height'].indexOf(dimensionType);
+        return this.cubeDimensions?.split(' ')[index];
       }
 
-      return this.cubeDimensions
+      return this.cubeDimensions;
     }
   }
-}
+};
 </script>
 
 <style scoped>
@@ -94,8 +94,8 @@ export default {
   height: v-bind(cubeSize('height') + 'px');
   background-color: v-bind(accentColor);
   border-radius: 2px;
-  -webkit-animation: sk-cubeGridScaleDelay 1.3s infinite ease-in-out;
-  animation: sk-cubeGridScaleDelay 1.3s infinite ease-in-out;
+  -webkit-animation: sk-cubeGridScaleDelay 1.3s infinite ease-out-out;
+  animation: sk-cubeGridScaleDelay 1.3s infinite ease-out-out;
 }
 
 .sk-cube-grid .sk-cube1 {

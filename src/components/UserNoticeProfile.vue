@@ -16,10 +16,10 @@
 
 <script>
 export default {
-  name: 'UserNoticeProfileComponent',
+  name: 'UserNoticeProfile',
 
   inject: ['accentColor']
-}
+};
 </script>
 
 <style scoped>

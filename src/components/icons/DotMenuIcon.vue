@@ -1,6 +1,6 @@
 <template>
   <svg
-    class="dot-menu-ico fill"
+    class="dot-menu-icon fill"
     width="16"
     height="4"
     viewBox="0 0 16 4"
