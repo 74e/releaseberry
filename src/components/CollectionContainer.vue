@@ -19,6 +19,7 @@
         v-model:showModal="showExpModal"
         v-model:gameTitle="gameTitle"
         v-model:accumulatedExp="accumulatedExp"
+        @collectAnimFinished="finalizeCollection"
       />
     </Transition>
   </div>
@@ -27,13 +28,11 @@
 <script>
 import ExperienceCollectionWindow from './ExperienceCollectionWindow.vue';
 import gameStore from '@/state/gameStore';
-// import { toastStore } from '@/state/toastStore';
+import { toastStore } from '@/state/toastStore';
 import { mapState, mapActions } from 'pinia';
 
 export default {
   name: 'LibraryContainer',
-
-  inject: ['accentColor'],
 
   components: { ExperienceCollectionWindow },
 
@@ -51,23 +50,43 @@ export default {
   },
 
   computed: {
-    ...mapState(gameStore, ['library', 'collectableGames']),
+    ...mapState(gameStore, ['library', 'ownGames', 'collectableGames']),
 
     collectable() {
-      return this.library.filter(({ cardData }) =>
+      return this.ownGames.filter(({ cardData }) =>
         this.collectableGames.includes(cardData.custom_game_config_id)
       );
     }
   },
 
   methods: {
-    ...mapActions(gameStore, ['calculateAccumulatedExp']),
+    ...mapActions(gameStore, ['calculateAccumulatedExp', 'collectExperience']),
 
     initCollection({ gameData, cardData }) {
-      this.customGameId = cardData.custom_game_config_id;
-      this.gameTitle = gameData.name;
-      this.accumulatedExp = this.calculateAccumulatedExp();
+      const { custom_game_config_id, created_at } = cardData;
+      const { name, release_date } = gameData;
+      this.customGameId = custom_game_config_id;
+      this.gameTitle = name;
+      this.accumulatedExp = this.calculateAccumulatedExp(release_date, created_at);
       this.showExpModal = true;
+    },
+
+    async finalizeCollection(expAfterCollection) {
+      try {
+        this.showExpModal = false;
+        await this.collectExperience(this.customGameId, expAfterCollection);
+
+        toastStore().add({
+          icon: 'ReleaseBerryIcon',
+          message: `Collected Released Title</br><b>${this.gameTitle}</b>`,
+          duration: 5000
+        });
+      } catch (error) {
+        toastStore().handleErrorMessage(
+          error,
+          `Something went wrong, could not collect released game`
+        );
+      }
     },
 
     clearCollectedGame() {
@@ -75,8 +94,6 @@ export default {
       this.customGameId = null;
       this.gameTitle = null;
       this.accumulatedExp = null;
-
-      // clear game from collectableGames array
     }
   }
 };
@@ -84,7 +101,19 @@ export default {
 
 <style scoped>
 .cc.cc.cc.cc {
-  filter: brightness(1.2);
+  animation: waveAnim forwards 2.5s infinite;
+  animation-timing-function: ease-in-out;
+}
+
+@keyframes waveAnim {
+  0%,
+  100% {
+    filter: brightness(1);
+  }
+
+  50% {
+    filter: brightness(1.4);
+  }
 }
 
 .collectable-container {
@@ -95,7 +124,7 @@ export default {
     font-size: 22px;
     margin-bottom: 8px;
     position: relative;
-    color: v-bind(accentColor);
+    color: rgba(var(--accentColor));
   }
 }
 
@@ -112,8 +141,8 @@ export default {
     90deg,
     rgba(255, 255, 255, 0.001) 0%,
     rgba(255, 255, 255, 0.001) 3%,
-    v-bind(accentColor + '2c') 40%,
-    v-bind(accentColor + '2c') 60%,
+    rgba(var(--accentColor), 0.17) 40%,
+    rgba(var(--accentColor), 0.17) 60%,
     rgba(255, 255, 255, 0.001) 97%,
     rgba(255, 255, 255, 0.001) 100%
   );
@@ -130,8 +159,8 @@ export default {
     background: linear-gradient(
       90deg,
       rgba(255, 255, 255, 0.001) 0%,
-      v-bind(accentColor) 40%,
-      v-bind(accentColor) 60%,
+      rgba(var(--accentColor)) 40%,
+      rgba(var(--accentColor)) 60%,
       rgba(255, 255, 255, 0.001) 100%
     );
   }

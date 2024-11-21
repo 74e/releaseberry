@@ -74,8 +74,6 @@ export default {
     LoadingOverlay
   },
 
-  inject: ['accentColor'],
-
   props: {
     selectedGameItem: {
       type: [Object, null],
@@ -168,7 +166,7 @@ export default {
     max-width: 650px;
     padding: 8px 12px 4px 12px;
     border: none;
-    border-bottom: 2px solid v-bind(accentColor);
+    border-bottom: 2px solid rgba(var(--accentColor));
     border-radius: 4px;
     background-color: transparent;
     color: var(--default-font-color);
@@ -193,8 +191,8 @@ button {
 
   &:hover {
     background-color: rgba(255, 255, 255, 0.12);
-    border-color: v-bind(accentColor);
-    color: v-bind(accentColor);
+    border-color: rgba(var(--accentColor));
+    color: rgba(var(--accentColor));
   }
 
   &:disabled {
@@ -292,7 +290,7 @@ button {
       }
 
       &.selected {
-        border: 1px solid v-bind(accentColor);
+        border: 1px solid rgba(var(--accentColor));
       }
 
       .following {
@@ -314,7 +312,7 @@ button {
 
           font-size: 14px;
           font-weight: bold;
-          background-color: v-bind(accentColor);
+          background-color: rgba(var(--accentColor));
 
           padding: 4px 0;
           border-radius: 4px 0 0 4px;

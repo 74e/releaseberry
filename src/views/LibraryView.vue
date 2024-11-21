@@ -1,9 +1,13 @@
 <template>
   <main>
     <TitleLogo />
-    <CardToolbar />
-    <CollectionContainer v-if="collectableGames.length > 0" />
-    <LibraryContainer @triggerGameModal="triggerGameModal" />
+    <template v-if="isUserLoggedIn">
+      <CardToolbar />
+      <Transition name="fade">
+        <CollectionContainer v-if="collectableGames.length > 0" />
+      </Transition>
+      <LibraryContainer @triggerGameModal="triggerGameModal" />
+    </template>
 
     <TransitionGroup name="fade">
       <GameDetailsModal
@@ -32,6 +36,7 @@ import EditGameListModal from '@/components/EditGameListModal.vue';
 import CollectionContainer from '@/components/CollectionContainer.vue';
 import LibraryContainer from '@/components/LibraryContainer.vue';
 import gameStore from '@/state/gameStore';
+import userStore from '@/state/userStore';
 import { mapState } from 'pinia';
 import DisplayAllIcons from '@/components/DisplayAllIcons.vue';
 
@@ -67,7 +72,11 @@ export default {
       'editingGameListId',
       'selectedGameListId',
       'collectableGames'
-    ])
+    ]),
+
+    isUserLoggedIn() {
+      return userStore().loggedInUser;
+    }
   },
 
   methods: {

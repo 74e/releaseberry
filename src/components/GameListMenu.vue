@@ -61,7 +61,7 @@ import { mapActions, mapState } from 'pinia';
 export default {
   name: 'GameListMenu',
 
-  inject: ['accentColor', 'hide'],
+  inject: ['hide'],
 
   data() {
     return {
@@ -141,7 +141,7 @@ export default {
 }
 
 .list-heading {
-  color: v-bind(accentColor);
+  color: rgba(var(--accentColor));
   font-weight: 500;
   font-size: 17px;
 }
@@ -229,7 +229,7 @@ input {
       transform: translateY(-50%);
       width: 4px;
       height: 16px;
-      background-color: v-bind(accentColor);
+      background-color: rgba(var(--accentColor));
       border-radius: 4px;
     }
 
@@ -247,7 +247,7 @@ input {
       &:hover {
         svg {
           &.fill {
-            fill: v-bind(accentColor);
+            fill: rgba(var(--accentColor));
           }
         }
       }

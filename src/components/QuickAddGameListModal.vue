@@ -2,7 +2,7 @@
   <div @click.self="cancel" class="backdrop">
     <div class="popup-box">
       <CloseIcon @click="cancel" />
-      <div class="modal-heading">Selected game list</div>
+      <div class="modal-heading">Add to game list(s)</div>
 
       <ul class="game-lists-container">
         <li
@@ -16,7 +16,7 @@
         </li>
 
         <span class="no-lists" v-if="userGameLists.length < 1">
-          You have not game lists
+          You have no game lists
         </span>
       </ul>
     </div>
@@ -32,8 +32,6 @@ export default {
   name: 'QuickAddGameListModal',
 
   props: ['followGameId'],
-
-  inject: ['accentColor'],
 
   data() {
     return {};
@@ -123,7 +121,7 @@ export default {
 }
 
 .modal-heading {
-  color: v-bind(accentColor);
+  color: rgba(var(--accentColor));
   padding-left: 4px;
   font-weight: 500;
   font-size: 18px;
@@ -166,12 +164,12 @@ export default {
       position: relative;
 
       &.active {
-        border-color: v-bind(accentColor + 'ba');
+        border-color: rgba(var(--accentColor), 0.73);
 
         &::after {
           content: '\25CF';
           position: absolute;
-          color: v-bind(accentColor);
+          color: rgba(var(--accentColor));
           top: -2.1px;
           left: 50%;
           transform: translate(-50%);
@@ -182,7 +180,7 @@ export default {
     &:hover {
       span {
         background-color: rgba(255, 255, 255, 0.137);
-        border-color: v-bind(accentColor);
+        border-color: rgba(var(--accentColor));
       }
 
       .status {

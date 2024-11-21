@@ -26,8 +26,6 @@ export default {
 
   emits: ['triggerGameModal'],
 
-  inject: ['accentColor'],
-
   data() {
     return {
       dragStartCardId: null,
@@ -44,7 +42,12 @@ export default {
   },
 
   computed: {
-    ...mapState(gameStore, ['library', 'selectedGameListId', 'filterLibraryOptions']),
+    ...mapState(gameStore, [
+      'library',
+      'selectedGameListId',
+      'filterLibraryOptions',
+      'filterSearchTerm'
+    ]),
 
     customGameIds() {
       return this.library.map((c) => c.cardData.custom_game_config_id);
@@ -55,13 +58,32 @@ export default {
     },
 
     filterStatus() {
-      return this.filterLibraryOptions.releaseStatus;
+      return this.filterLibraryOptions.status;
     },
 
     filteredLibrary() {
-      let filtered = this.library.filter((item) => {
-        const releaseDate = new Date(Number(item.gameData.release_date));
+      if (!this.library) return [];
+
+      let filtered = this.library;
+
+      if (this.filterSearchTerm) {
+        filtered = filtered.filter((item) => {
+          return item.gameData.name
+            .toLowerCase()
+            .includes(this.filterSearchTerm.toLowerCase());
+        });
+      }
+
+      filtered = filtered.filter((item) => {
+        let releaseDate = new Date(Number(item.gameData.release_date));
         const now = new Date();
+
+        if (
+          releaseDate.getFullYear() <= 1970 ||
+          releaseDate.toString() == 'Invalid Date'
+        ) {
+          releaseDate = false;
+        }
 
         switch (this.filterStatus) {
           case 'all':
@@ -72,6 +94,8 @@ export default {
             return releaseDate ? releaseDate < now : false;
           case 'TBD':
             return releaseDate ? false : true;
+          case 'collected':
+            return item.cardData.release_collected;
           default:
             return true;
         }
@@ -175,9 +199,9 @@ export default {
     position: absolute;
     inset: -18px;
     overflow: hidden;
-    box-shadow: inset 0px 0px 24px 4px v-bind(accentColor);
+    box-shadow: inset 0px 0px 24px 4px rgba(var(--accentColor));
     border-radius: 12px;
-    border: 2px solid v-bind(accentColor);
+    border: 2px solid rgba(var(--accentColor));
   }
 }
 

@@ -1,68 +1,44 @@
 <template>
   <main>
-    <template v-if="!isNonLoggedInUserPage">
-      <UserProfileCard v-if="userProfile" :userData="userProfile" />
+    <UserProfileCard v-if="userProfile?.id && !userNotFound" :userData="userProfile" />
 
-      <div class="feed-container">
-        <div class="feed-btn">
-          <div @click="setActiveTab(1)" :class="['tab-btn', { active: activeTab === 1 }]">
-            {{ tabName }}
-          </div>
-          <div class="devider" />
-          <div
-            @click="setActiveTab(2)"
-            :class="['tab-btn', { active: activeTab === 2 }]"
-            class="tab-btn"
-          >
-            Achivements
-          </div>
+    <div class="feed-container" :style="accentBorders">
+      <div class="feed-btn">
+        <div @click="setActiveTab(1)" :class="['tab-btn', { active: activeTab === 1 }]">
+          {{ tabName }}
         </div>
-
-        <div v-if="userLibrary" class="display-area">
-          <div class="game" v-for="item in userLibrary" :key="item.id">
-            <img :src="item.game.cover_url" alt="game cover" />
-            <div class="game-info">
-              <span class="type">Game</span>
-              <span class="title">{{ item.game.name }}</span>
-
-              <span class="release-label">Release date</span>
-              <span class="release-date">
-                {{ convertToDate(item.game.release_date) }}
-              </span>
-
-              <div class="options-container">
-                <button>Details</button>
-                <button><PlusIcon /> Add</button>
-              </div>
-            </div>
-          </div>
-
-          <!-- Implement this later when the backend has user feed logic
-          <component :is="displayComponent" />
-          -->
+        <div class="devider" />
+        <div @click="setActiveTab(2)" :class="['tab-btn', { active: activeTab === 2 }]">
+          Achievements
         </div>
       </div>
-    </template>
 
-    <userNoticeProfile v-else />
+      <Transition tag="div" name="fade" mode="out-in" v-if="gameItems" class="area">
+        <component :is="displayComponent" :gameItems="gameItems" @revert="revertView" />
+      </Transition>
+
+      <div v-if="userNotFound" class="not-found">Sorry, user not found</div>
+    </div>
   </main>
 </template>
 
 <script>
-import userStore from '@/state/userStore'
-import { mapState, mapActions } from 'pinia'
-import UserProfileCard from '@/components/UserProfileCard.vue'
-import userNoticeProfile from '@/components/UserNoticeProfile.vue'
+import userStore from '@/state/userStore';
+import { mapState, mapActions } from 'pinia';
+import UserProfileCard from '@/components/UserProfileCard.vue';
+import UserAchivements from '@/components/UserAchivements.vue';
+import UserLibrary from '@/components/UserLibrary.vue';
+import UserFeed from '@/components/UserFeed.vue';
 
 export default {
   name: 'ProfileView',
 
   components: {
     UserProfileCard,
-    userNoticeProfile
+    UserAchivements,
+    UserLibrary,
+    UserFeed
   },
-
-  inject: ['accentColor'],
 
   /**
    * This is for when the user is already on the profile page during a user search
@@ -70,7 +46,7 @@ export default {
   watch: {
     $route: {
       handler() {
-        this.initiateGetUserData()
+        this.initiateGetUserData();
       },
       deep: true
     }
@@ -79,223 +55,99 @@ export default {
   data() {
     return {
       activeTab: 1,
-      isNonLoggedInUserPage: false,
-      isUsersOwnPage: false
-    }
+      isUsersOwnPage: false,
+      userNotFound: false
+    };
   },
-
-  mounted() {},
 
   computed: {
     ...mapState(userStore, ['loggedInUser', 'userProfile']),
 
     tabName() {
-      return this.isUsersOwnPage ? 'My Feed' : 'Library'
+      return this.isUsersOwnPage ? 'My Feed' : 'Library';
     },
 
     displayComponent() {
-      return this.activeTab === 1 ? 'userLibrary' : 'userAchivements'
-
-      // if (this.isUsersOwnPage) { // Implement this later
-      //   return this.activeTab === 1 ? 'userFeed' : 'userAchivements'
-      // } else {
-      //   return this.activeTab === 1 ? 'userLibrary' : 'userAchivements'
-      // }
+      const userView = this.isUsersOwnPage ? 'UserFeed' : 'UserLibrary';
+      return this.activeTab === 1 ? userView : 'UserAchivements';
     },
 
-    userLibrary() {
-      return this.userProfile?.followedGames
+    gameItems() {
+      return this.userProfile?.followedGames;
+    },
+
+    accentBorders() {
+      if (!userStore().user?.userPreferences?.accentBorders) {
+        return 'border: 1px solid rgba(255, 255, 255, 0.1);';
+      }
+
+      return `border: solid rgba(var(--accentColor)); border-width: 2px 0;`;
     }
   },
 
   created() {
-    this.initiateGetUserData()
+    this.initiateGetUserData();
   },
 
   methods: {
     ...mapActions(userStore, ['getUserProfile']),
 
     setActiveTab(tab) {
-      this.activeTab = tab
+      this.activeTab = tab;
     },
 
     async initiateGetUserData() {
-      this.isNonLoggedInUserPage = false
-      this.isUsersOwnPage = false
+      this.isUsersOwnPage = false;
+      this.userNotFound = false;
 
-      const { username } = this.$route.params
+      const { handle } = this.$route.params;
 
-      // Check if a non-logged in user is on the profile page
-      if (!this.loggedInUser?.username && !username) {
-        this.isNonLoggedInUserPage = true
-        return
+      if (handle === '') {
+        this.$router.push('/');
+        return;
       }
 
       // Check if the logged in user is on their own profile page
-      if (this.loggedInUser?.username === username) this.isUsersOwnPage = true
+      if (this.loggedInUser?.handle === handle) this.isUsersOwnPage = true;
 
-      // get pinia to fetch the user profile into state
-      await this.getUserProfile(username)
+      try {
+        // get pinia to fetch the user profile into state
+        await this.getUserProfile(handle);
+      } catch (error) {
+        this.userNotFound = true;
+        return;
+      }
     },
 
-    convertToDate(time) {
-      let date = new Date(Number(time))
-      let day = date.getDate()
-      const month = date.toLocaleString('default', { month: 'long' })
-      const year = date.getFullYear()
-      day = day += this.getNumberSuffix(day)
-
-      return `${day} ${month} ${year}`
-    },
-
-    getNumberSuffix(day) {
-      if (day >= 11 && day <= 13) {
-        return 'th'
-      }
-
-      switch (day % 10) {
-        case 1:
-          return 'st'
-        case 2:
-          return 'nd'
-        case 3:
-          return 'rd'
-        default:
-          return 'th'
-      }
+    revertView() {
+      this.activeTab = 1;
     }
   }
-}
+};
 </script>
 
 <style scoped>
-.display-area {
+.area {
   overflow: hidden;
   overflow-y: scroll;
   height: 100%;
   -ms-overflow-style: none;
   scrollbar-width: none;
-  padding: 16px 8px;
-
-  display: flex;
-  flex-direction: column;
-  gap: 26px;
-
-  .game {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0 16px 0 32px;
-    position: relative;
-
-    &::after {
-      content: '';
-      position: absolute;
-      display: block;
-      width: 94%;
-      right: 50%;
-      transform: translate(50%, 13px);
-      height: 2px;
-      background: linear-gradient(
-        90deg,
-        rgba(0, 240, 255, 0) 0%,
-        v-bind(accentColor) 52%,
-        rgba(0, 144, 153, 0) 100%
-      );
-      bottom: 0;
-    }
-
-    img {
-      width: 90px;
-      border-radius: var(--radius-m);
-      border: 1px solid v-bind(accentColor + '80');
-    }
-
-    .game-info {
-      display: flex;
-      flex-direction: column;
-      padding: 4px 0;
-      margin-left: 12px;
-      width: 100%;
-
-      .type {
-        font-size: 12px;
-        color: v-bind(accentColor);
-        margin-bottom: 4px;
-
-        &::before {
-          content: '';
-          height: 15px;
-          width: 3px;
-          border-radius: 2px;
-          display: inline-block;
-          margin-right: 4px;
-          background-color: v-bind(accentColor);
-          transform: translateY(3px);
-        }
-      }
-
-      .title {
-        font-size: 20px;
-        color: var(--default-font-color);
-      }
-
-      .release-label {
-        font-size: 18px;
-        color: v-bind(accentColor);
-        margin-top: 4px;
-      }
-
-      .release-date {
-        font-size: 16px;
-        color: var(--default-font-color);
-      }
-
-      .options-container {
-        display: flex;
-        gap: 8px;
-
-        button {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-
-          padding: 6px 16px;
-          margin-top: 8px;
-          border-radius: var(--radius-m);
-          background-color: transparent;
-          border: 2px solid v-bind(accentColor);
-          color: v-bind(accentColor);
-          font-size: 15px;
-          outline: none;
-          cursor: pointer;
-          transition: all 0.3s ease-out;
-
-          .plus-icon {
-            margin-right: 6px;
-          }
-
-          &:hover {
-            background-color: var(--dark-fg-hover);
-          }
-        }
-      }
-    }
-  }
+  padding: 8px;
 }
 
 .feed-container {
   overflow: hidden;
-
   background-color: var(--dark-50);
   box-shadow:
     0px 4px 4px rgba(0, 0, 0, 0.25),
     0px 8px 11px rgba(0, 0, 0, 0.25);
   backdrop-filter: blur(20px);
   border-radius: var(--radius-m);
-  border: solid v-bind(accentColor);
-  border-width: 2px 0;
+  /* border: solid rgba(var(--accentColor));
+  border-width: 2px 0; */
   height: 100%;
+  padding-bottom: 32px;
 
   @media (max-width: 1150px) {
     border-radius: 0 0 var(--radius-m) var(--radius-m);
@@ -303,7 +155,7 @@ export default {
 
   .feed-btn {
     display: flex;
-    height: 42px;
+    height: 32px;
     position: relative;
 
     &::after {
@@ -323,7 +175,7 @@ export default {
       justify-content: center;
       align-items: center;
       width: 100%;
-      font-size: 22px;
+      font-size: 18px;
       font-family: var(--font-style-mplus);
       color: #717d8d;
       cursor: pointer;
@@ -341,16 +193,8 @@ export default {
       }
     }
 
-    @media (max-width: 1050px) {
-      height: 32px;
-
-      .tab-btn {
-        font-size: 18px;
-      }
-    }
-
     .active {
-      color: v-bind(accentColor);
+      color: rgba(var(--accentColor));
       background: transparent;
       cursor: default;
 
@@ -363,11 +207,19 @@ export default {
       width: 4px;
       background: linear-gradient(
         180deg,
-        v-bind(accentColor) 0%,
+        rgba(var(--accentColor)) 0%,
         rgba(40, 53, 61, 0) 90%
       );
     }
   }
+}
+
+.not-found {
+  margin-top: 100px;
+  text-align: center;
+  font-size: 22px;
+  font-weight: bold;
+  color: rgba(255, 255, 255, 0.3);
 }
 
 main {

@@ -21,8 +21,6 @@
 </template>
 
 <script>
-import colorStore from '@/state/colorStore';
-import { mapActions } from 'pinia';
 import timerDisplay from '@/components/TimerDisplay.vue';
 import { LoadImageInitTrigger } from '../../helperFunctions/common';
 
@@ -221,8 +219,6 @@ export default {
   },
 
   methods: {
-    ...mapActions(colorStore, ['setDefaultColor', 'setNewColor']),
-
     stringifyRGBA(colorValues) {
       const [R, G, B, A] = colorValues;
       return `rgba(${R},${G},${B},${A})`;

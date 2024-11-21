@@ -34,8 +34,6 @@
 export default {
   name: 'AccordionItem',
 
-  inject: ['accentColor'],
-
   props: {
     title: {
       type: String
@@ -120,7 +118,7 @@ export default {
       height: 24px;
       width: 5px;
       border-radius: 4px;
-      background-color: v-bind(accentColor);
+      background-color: rgba(var(--accentColor));
       opacity: 0;
       transition: opacity 0.3s ease-out;
     }
@@ -138,11 +136,11 @@ export default {
     }
 
     &.completed {
-      outline: 2px solid v-bind(accentColor + '80');
+      outline: 2px solid rgba(var(--accentColor), 0.5);
       cursor: pointer;
 
       h3 {
-        color: v-bind(accentColor + 'ce');
+        color: rgba(var(--accentColor), 0.8);
       }
 
       &:hover {

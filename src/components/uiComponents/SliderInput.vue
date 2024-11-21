@@ -8,8 +8,6 @@
 export default {
   name: 'SliderInput',
 
-  inject: ['accentColor'],
-
   props: {
     modelValue: {
       required: true
@@ -23,14 +21,14 @@ export default {
   computed: {
     value: {
       get() {
-        return this.modelValue
+        return this.modelValue;
       },
       set(value) {
-        this.$emit('update:modelValue', value)
+        this.$emit('update:modelValue', value);
       }
     }
   }
-}
+};
 </script>
 
 <style scoped>
@@ -64,7 +62,7 @@ input[type='range']::-webkit-slider-runnable-track {
   height: 3px;
   border-radius: 3px;
 
-  background: v-bind(accentColor);
+  background: rgba(var(--accentColor));
 }
 
 input[type='range']::-moz-range-track {
@@ -72,7 +70,7 @@ input[type='range']::-moz-range-track {
   appearance: none;
   height: 3px;
   border-radius: 3px;
-  background: v-bind(accentColor);
+  background: rgba(var(--accentColor));
 }
 
 input[type='range']::-ms-track {
@@ -80,14 +78,14 @@ input[type='range']::-ms-track {
   -moz-appearance: none;
   appearance: none;
   height: 3px;
-  background: v-bind(accentColor);
+  background: rgba(var(--accentColor));
   border-radius: 3px;
 }
 
 input[type='range']::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  border: 3px solid v-bind(accentColor);
+  border: 3px solid rgba(var(--accentColor));
   border-radius: 50%;
   height: 15px;
   width: 15px;
@@ -106,7 +104,7 @@ input[type='range']::-webkit-slider-thumb {
 input[type='range']::-moz-range-thumb {
   -moz-appearance: none;
   appearance: none;
-  border: 3px solid v-bind(accentColor);
+  border: 3px solid rgba(var(--accentColor));
   border-radius: 50%;
   height: 15px;
   width: 15px;
@@ -126,7 +124,7 @@ input[type='range']::-ms-thumb {
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
-  border: 3px solid v-bind(accentColor);
+  border: 3px solid rgba(var(--accentColor));
   border-radius: 50%;
   height: 15px;
   width: 15px;

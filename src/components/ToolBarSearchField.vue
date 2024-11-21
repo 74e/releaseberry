@@ -18,6 +18,8 @@
 </template>
 
 <script>
+import gameStore from '@/state/gameStore';
+
 export default {
   name: 'ToolBarSearchField',
 
@@ -45,12 +47,12 @@ export default {
 
   mounted() {
     document.addEventListener('keyup', this.handleSearchHotKeys);
-    document.addEventListener('click', this.handleClickOutside);
+    // document.addEventListener('click', this.handleClickOutside);
   },
 
   beforeUnmount() {
     document.removeEventListener('keyup', this.handleSearchHotKeys);
-    document.removeEventListener('click', this.handleClickOutside);
+    // document.removeEventListener('click', this.handleClickOutside);
   },
 
   methods: {
@@ -58,8 +60,8 @@ export default {
       clearTimeout(this.searchTimeout);
 
       this.searchTimeout = setTimeout(() => {
-        this.$emit('search', this.searchQuery);
-      }, 500);
+        gameStore().$patch({ filterSearchTerm: this.searchQuery });
+      }, 100);
     },
 
     initializeSearchField() {
@@ -70,12 +72,13 @@ export default {
     deinitializeSearchField() {
       this.isActive = false;
       this.searchQuery = '';
+      this.handleSearch();
     },
 
     handleSearchHotKeys(e) {
-      if (e.key === 'Escape' && this.showSearchField) {
-        this.$emit('toggleSearchField');
-      }
+      // if (e.key === 'Escape' && this.showSearchField) {
+      //   this.$emit('toggleSearchField');
+      // }
 
       if (e.target.nodeName === 'INPUT') return;
 

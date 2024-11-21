@@ -96,8 +96,6 @@ export default {
     }
   },
 
-  inject: ['accentColor'],
-
   data() {
     return {
       inputTimeout: null,
@@ -231,7 +229,7 @@ export default {
     outline: none;
 
     &:focus {
-      outline: 1px solid v-bind(accentColor + '90');
+      outline: 1px solid rgba(var(--accentColor), 0.55);
     }
   }
 

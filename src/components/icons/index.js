@@ -1,10 +1,8 @@
-import AchievementIcon from './AchievementIcon.vue';
 import CalendarIcon from './CalendarIcon.vue';
 import CardLayoutIcon from './CardLayoutIcon.vue';
 import ControllerIcon from './ControllerIcon.vue';
 import DotMenuIcon from './DotMenuIcon.vue';
 import FilterIcon from './FilterIcon.vue';
-import HomeIcon from './HomeIcon.vue';
 import IndividualCardIcon from './IndividualCardIcon.vue';
 import LayoutIcon from './LayoutIcon.vue';
 import LineMenuIcon from './LineMenuIcon.vue';
@@ -14,7 +12,6 @@ import NewListIcon from './NewListIcon.vue';
 import PlusIcon from './PlusIcon.vue';
 import ProfileIcon from './ProfileIcon.vue';
 import ReleaseBerryIcon from './ReleaseBerryIcon.vue';
-import ReleasedIcon from './ReleasedIcon.vue';
 import SearchIcon from './SearchIcon.vue';
 import ThemeIcon from './ThemeIcon.vue';
 import TinyArrowIcon from './TinyArrowIcon.vue';
@@ -34,15 +31,14 @@ import UpdateNoticeIcon from './UpdateNoticeIcon.vue';
 import CooldownIcon from './CooldownIcon.vue';
 import NodeIcon from './NodeIcon.vue';
 import EditIcon from './EditIcon.vue';
+import LockedIcon from './LockedIcon.vue';
 
 export default {
-  AchievementIcon,
   CalendarIcon,
   CardLayoutIcon,
   ControllerIcon,
   DotMenuIcon,
   FilterIcon,
-  HomeIcon,
   IndividualCardIcon,
   LayoutIcon,
   LineMenuIcon,
@@ -52,7 +48,6 @@ export default {
   PlusIcon,
   ProfileIcon,
   ReleaseBerryIcon,
-  ReleasedIcon,
   SearchIcon,
   ThemeIcon,
   TinyArrowIcon,
@@ -71,5 +66,6 @@ export default {
   UpdateNoticeIcon,
   CooldownIcon,
   NodeIcon,
-  EditIcon
+  EditIcon,
+  LockedIcon
 };

@@ -1,5 +1,5 @@
 <template>
-  <div v-if="loggedInUser" class="profile-card-container">
+  <div class="profile-card-container">
     <div class="profile-avatar">
       <img :src="avatar" alt="profile avatar" />
     </div>
@@ -7,24 +7,10 @@
     <div class="profile-details">
       <div class="profile-handle">
         <h2 class="handle">{{ username }}</h2>
-        <span class="id-handle">@{{ username }}</span>
+        <span class="id-handle">@{{ handle }}</span>
       </div>
 
-      <div class="profile-level">
-        <div class="level-display">
-          <span class="level-label">LEVEL</span>
-          <span class="level">{{ level }}</span>
-        </div>
-
-        <div class="xp-display">
-          <div class="xp-bar"><div class="current-xp-bar" /></div>
-          <span class="xp-label">
-            <span class="xp-number">
-              Exp: <span class="highlighted">{{ experience }} / 1000</span>
-            </span>
-          </span>
-        </div>
-      </div>
+      <ExperienceBar :staticLevel="level" :experience="experience" />
 
       <div class="follow-container">
         <button
@@ -36,12 +22,12 @@
         </button>
 
         <div class="profile-follow-info">
-          <div class="follow-border">
+          <div class="follow-border" @click="initShowFollowsModal('following')">
             <span class="label">Following</span>
             <span class="number">{{ following }}</span>
           </div>
 
-          <div class="follow-border">
+          <div class="follow-border" @click="initShowFollowsModal('followers')">
             <span class="label">Followers</span>
             <span class="number">{{ followers }}</span>
           </div>
@@ -49,16 +35,30 @@
       </div>
     </div>
   </div>
+
+  <Transition name="fade">
+    <UserListModal
+      v-if="showFollowsModal"
+      heading="Users following this game"
+      @closePopup="closeFollowsModal"
+      :userList="userList"
+    />
+  </Transition>
 </template>
 
 <script>
 import userStore from '@/state/userStore';
 import { mapState } from 'pinia';
+import ExperienceBar from './ExperienceBar.vue';
+import { toastStore } from '@/state/toastStore';
+import UserListModal from './UserListModal.vue';
 
 export default {
-  name: 'ProfileView',
+  name: 'UserProfileCard',
 
-  inject: ['accentColor', 'profileImages'],
+  components: { ExperienceBar, UserListModal },
+
+  inject: ['profileImages'],
 
   props: {
     userData: {
@@ -69,19 +69,25 @@ export default {
 
   data() {
     return {
-      activeTab: 'feed'
+      showFollowsModal: false,
+      displayFollowingOrFollows: null
     };
   },
 
-  mounted() {},
-
   computed: {
-    ...mapState(userStore, [
-      'loggedInUser',
-      'followUser',
-      'unfollowUser',
-      'getUserProfile'
-    ]),
+    ...mapState(userStore, ['loggedInUser', 'followUser', 'unfollowUser']),
+
+    userList() {
+      if (this.displayFollowingOrFollows == 'following') {
+        return this.userData.followedUsers.map((u) => u.following);
+      }
+
+      if (this.displayFollowingOrFollows == 'followers') {
+        return this.userData.followers.map((u) => u.follower);
+      }
+
+      return [];
+    },
 
     isFollowable() {
       return this.loggedInUser && this.loggedInUser.username !== this.userData.username;
@@ -89,6 +95,10 @@ export default {
 
     username() {
       return this.userData?.username;
+    },
+
+    handle() {
+      return this.userData?.handle;
     },
 
     level() {
@@ -127,18 +137,46 @@ export default {
   },
 
   methods: {
-    async follow() {
-      await this.followUser(this.userData.id);
+    initShowFollowsModal(displayType) {
+      this.displayFollowingOrFollows = displayType;
+      this.showFollowsModal = true;
+    },
 
-      // I am refetching the user profile to update
-      // This is not a good method, but it works for now
-      // I will implement the updating of the state manually later
-      await this.getUserProfile(this.userData.username);
+    closeFollowsModal() {
+      this.showFollowsModal = false;
+      this.displayFollowingOrFollows = null;
+    },
+
+    async follow() {
+      try {
+        await this.followUser(this.userData.id);
+
+        toastStore().add({
+          icon: 'ProfileIcon',
+          message: `Followed ${this.username}`
+        });
+      } catch (error) {
+        toastStore().handleErrorMessage(
+          error,
+          `Something went wrong, couldn't follow user`
+        );
+      }
     },
 
     async unfollow() {
-      await this.unfollowUser(this.userData.id);
-      await this.getUserProfile(this.userData.username);
+      try {
+        await this.unfollowUser(this.userData.id);
+
+        toastStore().add({
+          icon: 'ProfileIcon',
+          message: `Unfollowed ${this.username}`
+        });
+      } catch (error) {
+        toastStore().handleErrorMessage(
+          error,
+          `Something went wrong, couldn't unfollow user`
+        );
+      }
     }
   }
 };
@@ -155,7 +193,7 @@ export default {
     0px 8px 11px rgba(0, 0, 0, 0.25);
   backdrop-filter: blur(20px);
   border-radius: var(--radius-m);
-  border: 1px solid v-bind(accentColor + '50');
+  border: 1px solid rgba(var(--accentColor), 0.3);
   padding: 16px;
 
   right: calc(100% + 16px);
@@ -218,7 +256,7 @@ export default {
       border-radius: 4px;
       width: 3px;
       height: 35px;
-      background-color: v-bind(accentColor);
+      background-color: rgba(var(--accentColor));
       transition: all 0.3s ease-out;
       opacity: 100%;
     }
@@ -248,76 +286,6 @@ export default {
 
       span {
         font-size: 11px;
-      }
-    }
-  }
-
-  .profile-level {
-    display: flex;
-    align-items: center;
-    height: 50px;
-    margin-bottom: 8px;
-
-    @media (max-width: 1150px) {
-      margin: 0;
-    }
-
-    .level-display {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding-left: 8px;
-      gap: 4px;
-
-      .level-label {
-        font-size: 13px;
-        color: #848c8f;
-        margin-bottom: -8px;
-      }
-
-      .level {
-        font-size: 32px;
-        font-weight: 500;
-        color: v-bind(accentColor);
-      }
-
-      @media (max-width: 1150px) {
-        .level-label {
-          font-size: 9px;
-        }
-
-        .level {
-          font-size: 24px;
-        }
-      }
-    }
-
-    .xp-display {
-      padding: 0 8px;
-      width: 100%;
-
-      .xp-bar {
-        height: 5px;
-        width: 100%;
-        background-color: #2e2e2e;
-        border-radius: 4px;
-        .current-xp-bar {
-          height: 100%;
-          width: 34%;
-          background-color: v-bind(accentColor);
-          border-radius: 4px;
-        }
-      }
-
-      .xp-label {
-        word-spacing: 1px;
-        font-size: 12px;
-        color: #678793;
-
-        .highlighted {
-          word-spacing: -2px;
-          color: #99afb8;
-        }
       }
     }
   }
@@ -354,8 +322,8 @@ export default {
     }
 
     &:hover {
-      border: 1px solid v-bind(accentColor);
-      color: v-bind(accentColor);
+      border: 1px solid rgba(var(--accentColor));
+      color: rgba(var(--accentColor));
       filter: brightness(1.4);
     }
   }

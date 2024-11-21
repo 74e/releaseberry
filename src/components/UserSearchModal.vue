@@ -47,8 +47,6 @@ export default {
     UserSearchItem
   },
 
-  inject: ['accentColor'],
-
   data() {
     return {
       searchValue: '',
@@ -116,13 +114,13 @@ export default {
       border-radius: var(--radius-m);
       background-color: var(--dark-fg);
       border: 1px solid #ffffff1c;
-      border-bottom: 1px solid v-bind(accentColor);
+      border-bottom: 1px solid rgba(var(--accentColor));
       color: var(--default-font-color);
       font-size: 15px;
       outline: none;
 
       &:focus {
-        outline: 1px solid v-bind(accentColor + '90');
+        outline: 1px solid rgba(var(--accentColor), 0.55);
       }
     }
 

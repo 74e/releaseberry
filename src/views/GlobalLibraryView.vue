@@ -49,7 +49,6 @@ export default {
 
   mounted() {
     this.initialize();
-    console.log(gameStore().collectableGames);
   },
 
   computed: {

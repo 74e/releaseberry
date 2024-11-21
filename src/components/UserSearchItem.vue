@@ -1,5 +1,5 @@
 <template>
-  <RouterLink @click="hide" :to="`/user/${item.username}`">
+  <RouterLink @click="hide" :to="`/user/${item.handle}`">
     <div class="search-item">
       <div class="profile-image">
         <img :src="profileImage" alt="Profile Image" />

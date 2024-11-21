@@ -87,8 +87,6 @@ export default {
 
   props: ['displayData'],
 
-  inject: ['accentColor'],
-
   data() {
     return {
       timesPresetUsed: null,

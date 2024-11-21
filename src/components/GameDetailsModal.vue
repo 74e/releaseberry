@@ -18,7 +18,7 @@
 
         <WindowPopup
           ref="dotmenu"
-          v-if="isAlreadyInLibrary"
+          v-if="isUserAdmin || isInLibrary"
           position="bottom-left"
           :margin="6"
         >
@@ -28,14 +28,19 @@
 
           <template #window>
             <div class="dropdown-container">
-              <div @click="toggleConfirmationPopup" class="item">
+              <div v-if="isInLibrary" @click="toggleQuickAddGameListModal" class="item">
+                <NewListIcon />
+                <span>Save to game list</span>
+              </div>
+
+              <div v-if="isInLibrary" @click="toggleConfirmationPopup" class="item">
                 <TrashIcon />
                 <span>Remove</span>
               </div>
 
-              <div @click="toggleQuickAddGameListModal" class="item">
-                <NewListIcon />
-                <span>Save to game list</span>
+              <div v-if="isUserAdmin" @click="toggleAdminConfirmationPopup" class="item">
+                <NoticeIcon />
+                <span>Completely delete game</span>
               </div>
             </div>
           </template>
@@ -61,16 +66,13 @@
           <ProfileIcon class="icon-label" />
         </div>
 
-        <div class="exp">
-          <span class="label">Accumulated Experience</span>
-          <span class="exp-count">19238 Exp</span>
-        </div>
+        <AccumulatedXpDisplay v-if="showExp" :data="displayData" />
 
         <WindowPopup
           position="top-left"
           width="250"
           :accentBorders="['bottom']"
-          v-if="!isAlreadyInLibrary"
+          v-if="!isInLibrary"
         >
           <ButtonComponent size="s" minWidth="unset">
             <span class="default-text"> Add to Library </span>
@@ -99,17 +101,27 @@
     </div>
 
     <ConfirmationModal
+      v-if="showAdminConfirmationModal"
+      :mainText="`Are you sure you want to <br /> completely delete <b>${gameData?.name}?</b> `"
+      subText="This action will affect all users <br /> who saved this game"
+      @closePopup="toggleAdminConfirmationPopup"
+      @confirm="finalizeCompleteDeletion"
+    />
+    <ConfirmationModal
       v-if="showConfirmationModal"
       :mainText="`Are you sure you want to remove <br /> <b>${gameData?.name}?</b> `"
       subText="Accumulated experience will not be collectable upon release"
       @closePopup="toggleConfirmationPopup"
       @confirm="finalizeUnfollow"
     />
-    <UserFollowingGameModal
-      v-if="showFollowsModal"
-      @closePopup="toggleFollowsModal"
-      :followers="follows"
-    />
+    <Transition name="fade">
+      <UserListModal
+        v-if="showFollowsModal"
+        heading="Users following this game"
+        @closePopup="toggleFollowsModal"
+        :userList="follows"
+      />
+    </Transition>
     <QuickAddGameListModal
       v-if="showQuickAddModal"
       @closePopup="toggleQuickAddGameListModal"
@@ -126,8 +138,9 @@ import AddCustomDisplay from './AddCustomDisplay.vue';
 import WindowPopup from './uiComponents/WindowPopup.vue';
 import ConfirmationModal from './ConfirmationModal.vue';
 import GameDetailsDisplay from './GameDetailsDisplay.vue';
-import UserFollowingGameModal from './UserFollowingGameModal.vue';
+import UserListModal from './UserListModal.vue';
 import QuickAddGameListModal from './QuickAddGameListModal.vue';
+import AccumulatedXpDisplay from './AccumulatedXpDisplay.vue';
 import gameStore from '@/state/gameStore';
 import cardStore from '@/state/cardStore';
 import userStore from '@/state/userStore';
@@ -139,8 +152,6 @@ export default {
 
   props: ['displayData'],
 
-  inject: ['accentColor'],
-
   components: {
     ModalPopup,
     WindowPopup,
@@ -149,8 +160,9 @@ export default {
     ConfirmationModal,
     CardStyleDisplay,
     AddCustomDisplay,
-    UserFollowingGameModal,
-    QuickAddGameListModal
+    UserListModal,
+    QuickAddGameListModal,
+    AccumulatedXpDisplay
   },
 
   data() {
@@ -158,6 +170,7 @@ export default {
       showConfirmationModal: false,
       showFollowsModal: false,
       showQuickAddModal: false,
+      showAdminConfirmationModal: false,
       mode: 'game'
     };
   },
@@ -186,21 +199,55 @@ export default {
     },
 
     follows() {
-      return this.gameData?.followers;
+      return this.gameData?.followers.map((u) => u.user);
     },
 
-    isAlreadyInLibrary() {
+    isInLibrary() {
       return this.library?.some((item) => item.gameData.id === this.gameId);
     },
 
     isUserLoggedIn() {
       return userStore().loggedInUser;
+    },
+
+    isUserAdmin() {
+      if (!this.isUserLoggedIn) return false;
+      return this.isUserLoggedIn.role === 'ADMIN';
+    },
+
+    showExp() {
+      return this.$route.name === 'library';
     }
   },
 
   methods: {
-    ...mapActions(gameStore, ['unfollowGame', 'addGameAndCopyPreset']),
+    ...mapActions(gameStore, [
+      'unfollowGame',
+      'addGameAndCopyPreset',
+      'calculateAccumulatedExp',
+      'adminDeleteSteamGame'
+    ]),
     ...mapActions(cardStore, ['getUserCardConfigurations']),
+
+    async finalizeCompleteDeletion() {
+      try {
+        const gameName = this.gameData.name;
+
+        await this.adminDeleteSteamGame(this.gameId);
+
+        toastStore().add({
+          icon: 'TrashIcon',
+          message: `<b>${gameName}</b> deleted from Release Berry`
+        });
+
+        this.$refs.modal.hide();
+      } catch (error) {
+        toastStore().handleErrorMessage(
+          error,
+          `Something went wrong, Could not add game to library`
+        );
+      }
+    },
 
     async finalizeUnfollow() {
       try {
@@ -213,7 +260,7 @@ export default {
           message: `<b>${gameName}</b> removed from Library`
         });
 
-        if (this.$router.currentRoute._value.name === 'main') {
+        if (this.$router.currentRoute._value.name === 'library') {
           this.$refs.modal.hide();
         }
       } catch (error) {
@@ -243,6 +290,11 @@ export default {
           `Something went wrong, could not add game`
         );
       }
+    },
+
+    toggleAdminConfirmationPopup() {
+      this.$refs.dotmenu.hide();
+      this.showAdminConfirmationModal = !this.showAdminConfirmationModal;
     },
 
     toggleConfirmationPopup() {
@@ -352,27 +404,6 @@ export default {
     }
   }
 
-  .exp {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-
-    span {
-      display: block;
-      text-align: center;
-    }
-
-    .label {
-      font-size: 12px;
-      color: rgba(255, 255, 255, 0.4);
-    }
-
-    .exp-count {
-      color: v-bind(accentColor);
-    }
-  }
-
   .label {
     font-size: 14px;
     font-weight: 300;
@@ -396,7 +427,7 @@ export default {
     width: 340px;
     background-color: var(--dark-85);
     box-shadow: var(--shadow-default);
-    border: solid v-bind(accentColor);
+    border: solid rgba(var(--accentColor));
     border-width: 0 1px 0 1px;
     border-radius: 8px;
     padding: 18px 8px;
@@ -470,7 +501,7 @@ export default {
     fill: rgba(255, 255, 255, 0.486);
 
     &:hover {
-      fill: v-bind(accentColor);
+      fill: rgba(var(--accentColor));
     }
   }
 }
@@ -503,7 +534,8 @@ export default {
       height: 18px;
     }
 
-    .trash-icon {
+    .trash-icon,
+    .notice-icon {
       filter: invert(1);
     }
   }

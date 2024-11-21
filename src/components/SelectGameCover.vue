@@ -120,8 +120,6 @@ export default {
     ButtonComponent
   },
 
-  inject: ['accentColor'],
-
   props: {
     selectedGameItem: {
       type: [Number, null],
@@ -269,7 +267,7 @@ export default {
       position: absolute;
       bottom: calc(100% + 6px);
       font-size: 16px;
-      color: v-bind(accentColor);
+      color: rgba(var(--accentColor));
 
       &.error {
         filter: invert(1);
@@ -415,7 +413,7 @@ export default {
 
       .steamdb-link {
         text-decoration: underline;
-        color: v-bind(accentColor + 'b2');
+        color: rgba(var(--accentColor), 0.7);
       }
     }
   }
@@ -429,7 +427,7 @@ export default {
   .heading {
     font-weight: 400;
     text-align: center;
-    color: v-bind(accentColor);
+    color: rgba(var(--accentColor));
   }
 }
 

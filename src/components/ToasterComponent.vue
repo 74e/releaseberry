@@ -32,6 +32,9 @@
         >
           <component :is="toast.icon" class="icon" />
           <div class="message" v-html="toast.message" />
+          <div v-if="toast.reward" class="exp-reward">
+            <b>+{{ toast.reward }}Exp</b>
+          </div>
         </div>
       </li>
     </TransitionGroup>
@@ -44,8 +47,6 @@ import { toastStore } from '../state/toastStore';
 
 export default {
   name: 'ToasterComponent',
-
-  inject: ['accentColor'],
 
   props: {
     scaleOffset: {
@@ -158,11 +159,11 @@ export default {
   cursor: pointer;
   user-select: none;
   border-radius: var(--radius-m);
-  border-top: 2px solid v-bind(accentColor);
+  border-top: 2px solid rgba(var(--accentColor));
   background-color: var(--dark-50);
   padding: 4px;
   font-weight: 500;
-  color: v-bind(accentColor);
+  color: rgba(var(--accentColor));
   box-shadow: 0px 0px 12px rgba(82, 82, 82, 0.3);
   backdrop-filter: blur(10px);
   transition: all 0.3s;

@@ -47,22 +47,18 @@ import { mapState } from 'pinia';
 export default {
   name: 'LibraryFilterMenu',
 
-  inject: ['accentColor', 'hide'],
+  inject: ['hide'],
 
   data() {
     return {
-      availableReleaseStatus: ['all', 'unreleased', 'released']
+      availableReleaseStatus: ['all', 'unreleased', 'TBD', 'released', 'collected']
     };
-  },
-
-  mounted() {
-    console.log(this.filterLibraryOptions);
   },
 
   computed: {
     ...mapState(gameStore, ['filterLibraryOptions']),
     currentStatus() {
-      return this.filterLibraryOptions.releaseStatus;
+      return this.filterLibraryOptions.status;
     },
     currentOptions() {
       return this.filterLibraryOptions.option;
@@ -74,7 +70,7 @@ export default {
 
   methods: {
     setReleaseStatus(status) {
-      this.filterLibraryOptions.releaseStatus = status;
+      this.filterLibraryOptions.status = status;
       this.hide();
     },
 
@@ -104,7 +100,7 @@ h2 {
   display: block;
   margin-bottom: 4px;
   text-align: center;
-  color: v-bind(accentColor);
+  color: rgba(var(--accentColor));
   font-weight: 500;
   font-size: 17px;
 }
@@ -174,7 +170,7 @@ h2 {
 
       &::after {
         content: '';
-        background-color: v-bind(accentColor);
+        background-color: rgba(var(--accentColor));
         display: block;
         position: absolute;
         left: 0;

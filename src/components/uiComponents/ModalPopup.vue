@@ -14,15 +14,20 @@
 </template>
 
 <script>
+import userStore from '@/state/userStore';
+
 export default {
   name: 'ModalPopup',
-
-  inject: ['accentColor', 'duration'],
 
   props: {
     clickOutside: {
       type: Boolean,
       default: false
+    },
+
+    escapeEvent: {
+      type: Boolean,
+      default: true
     },
 
     closeButton: {
@@ -116,12 +121,16 @@ export default {
   computed: {
     borderStyle() {
       if (this.accentBorders.includes('none')) return '';
-      if (this.accentBorders.includes('faint')) {
+
+      if (
+        this.accentBorders.includes('faint') ||
+        !userStore().user?.userPreferences?.accentBorders
+      ) {
         return 'border: 1px solid rgba(255, 255, 255, 0.1);';
       }
 
       return this.accentBorders.reduce((border, selectedBorder) => {
-        return (border += `border-${selectedBorder}: ${this.borderWidth}px solid ${this.accentColor};`);
+        return (border += `border-${selectedBorder}: ${this.borderWidth}px solid rgba(var(--accentColor));`);
       }, '');
     },
 
@@ -149,6 +158,8 @@ export default {
     },
 
     handleEscape(e) {
+      if (!this.escapeEvent) return;
+
       if (e.key === 'Escape') {
         this.hide();
       }
@@ -205,6 +216,6 @@ export default {
 
 .fade-enter-active,
 .fade-leave-active {
-  transition: all v-bind(animaSpeed + 's') ease-out;
+  transition: all 0.4s ease-out;
 }
 </style>

@@ -21,8 +21,8 @@ export default {
     });
   },
 
-  collectExperience(custom_game_config_id) {
-    return api.post(`game/collect-experience`, { custom_game_config_id });
+  collectExperience(customGameConfigId) {
+    return api.post(`game/collect-experience`, { customGameConfigId });
   },
 
   addSteamGame({ gameData, cardData, index }) {
@@ -31,6 +31,10 @@ export default {
       cardData,
       index
     });
+  },
+
+  adminDeleteSteamGame(appId) {
+    return api.delete(`game/index/${appId}`);
   },
 
   addGameAndCopyPreset({ gameId, customGameConfigId, index }) {
@@ -61,7 +65,6 @@ export default {
   },
 
   deleteGameFromGameList({ gameListId, followGameId }) {
-    console.log('passed');
     return api.delete(`game/list/${gameListId}/remove-game`, {
       params: { followGameId }
     });

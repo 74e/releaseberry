@@ -15,7 +15,7 @@
         <component @click="toggleSearchField" :is="searchIcon" />
       </Transition>
 
-      <WindowPopup>
+      <WindowPopup position="bottom-left">
         <FilterIcon />
         <template #window>
           <LibraryFilterMenu />
@@ -40,7 +40,6 @@
 
   <ToolBarSearchField
     :showSearchField="showSearchField"
-    @search="search"
     @toggle-search-field="toggleSearchField"
   />
   <Transition name="fade">
@@ -66,8 +65,6 @@ export default {
     LibraryFilterMenu
   },
 
-  inject: ['accentColor', 'backgroundColor', 'backgroundPosition', 'duration'],
-
   data() {
     return {
       showSearchField: false,
@@ -88,10 +85,6 @@ export default {
 
     toggleAddGameModal() {
       this.showAddGameModal = !this.showAddGameModal;
-    },
-
-    search(query) {
-      console.log(query, 'searching');
     }
   }
 };
@@ -133,8 +126,8 @@ export default {
       font-size: 16px;
 
       background-color: transparent;
-      color: v-bind(accentColor);
-      border: 2px solid v-bind(accentColor + 'c7');
+      color: rgba(var(--accentColor));
+      border: 2px solid rgba(var(--accentColor), 0.78);
       border-radius: 4px;
       svg {
         margin-right: 4px;
@@ -175,7 +168,7 @@ export default {
 
 .add-title-btn {
   cursor: pointer;
-  transition: all v-bind(duration + 's') ease-out;
+  transition: all 0.3s ease-out;
 
   &:hover {
     filter: var(--hover-filter-effect);

@@ -28,8 +28,6 @@
 export default {
   name: 'DropDown',
 
-  inject: ['accentColor'],
-
   props: {
     label: {
       type: String,
@@ -272,7 +270,7 @@ li {
           left: 0;
           top: 50%;
           transform: translateY(-50%);
-          background-color: v-bind(accentColor);
+          background-color: rgba(var(--accentColor));
           opacity: 0;
           transition: opacity 0.3s ease-out;
         }

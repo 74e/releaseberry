@@ -24,8 +24,6 @@
 export default {
   name: 'LoadingOverlay',
 
-  inject: ['accentColor'],
-
   props: {
     isLoading: {
       type: Boolean,
@@ -92,7 +90,7 @@ export default {
 .sk-cube-grid .sk-cube {
   width: v-bind(cubeSize('width') + 'px');
   height: v-bind(cubeSize('height') + 'px');
-  background-color: v-bind(accentColor);
+  background-color: rgba(var(--accentColor));
   border-radius: 2px;
   -webkit-animation: sk-cubeGridScaleDelay 1.3s infinite ease-out-out;
   animation: sk-cubeGridScaleDelay 1.3s infinite ease-out-out;

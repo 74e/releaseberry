@@ -2,7 +2,7 @@
   <div class="color-display">
     <span class="color-code">
       <span class="rgb">{{ colorDisplay.rgb }}</span>
-      <span class="alpha">{{ colorDisplay.alpha + '%' }}</span>
+      <span v-if="alphaChannel" class="alpha">{{ colorDisplay.alpha + '%' }}</span>
     </span>
 
     <WindowPopup width="300">
@@ -11,8 +11,9 @@
         <div class="pad">
           <ColourPicker
             default-format="hex"
-            :visible-formats="['hex', 'hsl', 'rgb']"
+            :visible-formats="visibleFormat"
             :color="color"
+            :alphaChannel="alphaChannel"
             @color-change="updateColor"
           />
         </div>
@@ -22,9 +23,9 @@
 </template>
 
 <script>
-import cc from '../../helperFunctions/color'
-import { ColorPicker as ColourPicker } from 'vue-accessible-color-picker'
-import WindowPopup from './WindowPopup.vue'
+import cc from '../../helperFunctions/color';
+import { ColorPicker as ColourPicker } from 'vue-accessible-color-picker';
+import WindowPopup from './WindowPopup.vue';
 
 export default {
   name: 'ColorPicker',
@@ -37,44 +38,54 @@ export default {
   data() {
     return {
       displayColor: null
-    }
+    };
   },
 
   props: {
     modelValue: {
       type: Array,
       required: true
+    },
+
+    visibleFormat: {
+      type: Array,
+      default: () => ['hex', 'hsl', 'rgb']
+    },
+
+    alphaChannel: {
+      type: Boolean,
+      default: true
     }
   },
 
   methods: {
     updateColor(e) {
-      const { r, g, b, a } = e.colors.rgb
+      const { r, g, b, a } = e.colors.rgb;
 
-      this.$emit('update:modelValue', [r, g, b, a])
+      this.$emit('update:modelValue', [r, g, b, a]);
     }
   },
 
   computed: {
     color() {
-      const [r, g, b, a] = this.modelValue
+      const [r, g, b, a] = this.modelValue;
 
-      return { r, g, b, a }
+      return { r, g, b, a };
     },
 
     colorDisplay() {
       const [r, g, b, a] = this.modelValue.map((c) => {
-        if (c > 1) return Math.round(c)
-        return c
-      })
+        if (c > 1) return Math.round(c);
+        return c;
+      });
 
-      const hexWithAlpha = cc.rgbaToHex(r, g, b, a)
-      const rgb = cc.rgbaToHex(r, g, b).slice(0, 7)
+      const hexWithAlpha = cc.rgbaToHex(r, g, b, a);
+      const rgb = cc.rgbaToHex(r, g, b).slice(0, 7);
 
-      return { hexWithAlpha, rgb, alpha: (a * 100).toFixed(0) }
+      return { hexWithAlpha, rgb, alpha: (a * 100).toFixed(0) };
     }
   }
-}
+};
 </script>
 
 <style>
@@ -476,6 +487,7 @@ input::-webkit-inner-spin-button {
 
 /* Firefox */
 input[type='number'] {
+  appearance: textfield;
   -moz-appearance: textfield;
 }
 </style>

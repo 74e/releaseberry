@@ -18,11 +18,17 @@
       </li>
 
       <li>
-        <RouterLink :to="`/user/${this.username || ''}`">
+        <RouterLink v-if="user" :to="`/user/${this.userHandle || ''}`">
           <div class="icon-box">
             <ProfileIcon />
           </div>
         </RouterLink>
+
+        <NotLoggedInWindow
+          v-else
+          @openAuthModal="openAuthModal"
+          @openAuthSignUpModal="openAuthSignUpModal"
+        />
       </li>
 
       <li @click="openUserSearchModal">
@@ -40,7 +46,7 @@
   </nav>
 
   <TransitionGroup name="fade">
-    <AuthModal v-if="showAuthModal" v-model:showModal="showAuthModal" />
+    <AuthModal ref="authModal" v-if="showAuthModal" v-model:showModal="showAuthModal" />
     <UserSearchModal
       ref="UserSearchModal"
       v-if="showUserSearchModal"
@@ -52,9 +58,9 @@
 <script>
 import userStore from '@/state/userStore';
 import SettingsMenu from './SettingsMenu.vue';
-import { mapState } from 'pinia';
 import AuthModal from './AuthModal.vue';
 import UserSearchModal from './UserSearchModal.vue';
+import NotLoggedInWindow from './NotLoggedInWindow.vue';
 
 export default {
   name: 'NavbarMenu',
@@ -62,10 +68,9 @@ export default {
   components: {
     SettingsMenu,
     AuthModal,
-    UserSearchModal
+    UserSearchModal,
+    NotLoggedInWindow
   },
-
-  inject: ['accentColor'],
 
   data() {
     return {
@@ -75,12 +80,25 @@ export default {
   },
 
   computed: {
-    ...mapState(userStore, ['username'])
+    user() {
+      return userStore().user;
+    },
+
+    userHandle() {
+      return this.user?.handle;
+    }
   },
 
   methods: {
     openAuthModal() {
       this.showAuthModal = true;
+    },
+
+    openAuthSignUpModal() {
+      this.showAuthModal = true;
+      this.$nextTick(() => {
+        this.$refs.authModal.showLogin = false;
+      });
     },
 
     openUserSearchModal() {
@@ -152,7 +170,7 @@ span {
   top: 50%;
   left: 40px;
   transform: translateY(-50%);
-  color: v-bind(accentColor);
+  color: rgba(var(--accentColor));
   padding: 8px 16px;
   display: none;
 }

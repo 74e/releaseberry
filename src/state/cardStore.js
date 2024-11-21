@@ -6,7 +6,7 @@ import { toRaw } from 'vue';
 
 const cardStore = defineStore('Card', {
   state: () => ({
-  cardConfigs: null
+    cardConfigs: null
   }),
 
   getters: {

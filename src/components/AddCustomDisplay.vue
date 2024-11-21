@@ -47,8 +47,6 @@ export default {
     ButtonComponent
   },
 
-  inject: ['accentColor'],
-
   props: {
     displayData: {
       type: Object

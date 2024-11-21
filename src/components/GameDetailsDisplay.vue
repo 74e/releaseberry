@@ -86,8 +86,6 @@ export default {
     WindowPopup
   },
 
-  inject: ['accentColor'],
-
   props: {
     displayData: {
       type: [Object, null],
@@ -150,7 +148,7 @@ export default {
       if (this.loadingUpdate) return;
 
       // check if theres an update cooldown
-      if (userStore()?.loggedInUser.role !== 'ADMIN' && this.hasUpdateCooldown()) {
+      if (userStore()?.loggedInUser?.role !== 'ADMIN' && this.hasUpdateCooldown()) {
         toastStore().add({
           icon: 'CooldownIcon',
           message: `<span>Title currently on update cooldown</span> <br /> <b>Available in ${this.cooldownTime} Hours</b>`,
@@ -236,17 +234,17 @@ export default {
 
       .cooldown-notice {
         background-color: var(--dark-fg);
-        border-right: 1px solid v-bind(accentColor);
+        border-right: 1px solid rgba(var(--accentColor));
         border-radius: 4px;
         text-align: center;
         font-size: 15px;
         width: 270px;
         font-weight: 500;
         padding: 4px;
-        color: v-bind(accentColor);
+        color: rgba(var(--accentColor));
 
         span {
-          color: v-bind(accentColor + 'd5');
+          color: rgba(var(--accentColor), 0.84);
           font-weight: 300;
         }
       }
@@ -263,7 +261,7 @@ export default {
           font-size: 15px;
 
           .accent {
-            color: v-bind(accentColor);
+            color: rgba(var(--accentColor));
           }
         }
       }
@@ -289,18 +287,18 @@ export default {
         }
 
         &:hover {
-          color: v-bind(accentColor);
+          color: rgba(var(--accentColor));
           background-color: rgba(255, 255, 255, 0.021);
-          border-color: v-bind(accentColor);
+          border-color: rgba(var(--accentColor));
           svg {
-            fill: v-bind(accentColor);
+            fill: rgba(var(--accentColor));
           }
         }
       }
 
       .up-to-date-notice {
         font-size: 14px;
-        color: v-bind(accentColor);
+        color: rgba(var(--accentColor));
         width: 76px;
       }
 
@@ -331,17 +329,17 @@ export default {
         }
 
         &:hover {
-          color: v-bind(accentColor);
+          color: rgba(var(--accentColor));
 
           svg {
-            fill: v-bind(accentColor);
+            fill: rgba(var(--accentColor));
           }
         }
       }
     }
 
     .type {
-      color: v-bind(accentColor);
+      color: rgba(var(--accentColor));
       position: relative;
       font-size: 16px;
       text-transform: capitalize;
@@ -354,7 +352,7 @@ export default {
         width: 3px;
         border-radius: 2px;
         height: 18px;
-        background: v-bind(accentColor);
+        background: rgba(var(--accentColor));
 
         position: absolute;
         top: 50%;
@@ -376,7 +374,7 @@ export default {
       font-size: 14px;
       font-weight: 600;
       padding: 4px;
-      color: v-bind(accentColor);
+      color: rgba(var(--accentColor));
     }
 
     p {
@@ -391,7 +389,7 @@ export default {
 
       .genre-item {
         padding: 0 6px;
-        border-right: 1px solid v-bind(accentColor);
+        border-right: 1px solid rgba(var(--accentColor));
 
         &:first-child {
           padding-left: 0;
@@ -422,7 +420,7 @@ export default {
       width: 2px;
       border-radius: 2px;
       height: 100%;
-      background-color: v-bind(accentColor + 'c5');
+      background-color: rgba(var(--accentColor), 0.77);
     }
 
     .developer,
@@ -433,7 +431,7 @@ export default {
       span {
         font-size: 14px;
         font-weight: 600;
-        color: v-bind(accentColor);
+        color: rgba(var(--accentColor));
       }
     }
   }
@@ -443,7 +441,7 @@ export default {
     padding: 18px 24px;
     background-color: var(--dark-95);
     border-radius: var(--radius-sm);
-    border: 1px solid v-bind(accentColor + '55');
+    border: 1px solid rgba(var(--accentColor), 0.33);
     box-shadow: inset 0px 0px 16px -6px rgba(255, 255, 255, 0.089);
 
     span {
@@ -451,7 +449,7 @@ export default {
       font-size: 22px;
       font-weight: 600;
       padding-bottom: 12px;
-      color: v-bind(accentColor);
+      color: rgba(var(--accentColor));
     }
 
     &:deep(img) {

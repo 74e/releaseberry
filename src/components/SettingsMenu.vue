@@ -2,6 +2,7 @@
   <WindowPopup
     :position="windowPosition"
     :margin="margin"
+    width="130"
     borderRadius="s"
     :accentBorders="[borderStyle]"
     :borderWidth="1"
@@ -11,16 +12,21 @@
 
     <template #window>
       <div class="options-container">
-        <div>
+        <RouterLink
+          class="item"
+          :to="`/settings`"
+          @click="closeWindow"
+          v-if="loggedInUser"
+        >
           <SettingsIcon />
           <span> Settings </span>
-        </div>
+        </RouterLink>
 
-        <div @click="openModal" v-if="!loggedInUser">
+        <div class="item" @click="openModal" v-if="!loggedInUser">
           <LoginIcon />
           <span> Login </span>
         </div>
-        <div @click="logoutActions" v-else>
+        <div class="item" @click="logoutActions" v-else>
           <LogoutIcon />
           <span>Logout</span>
         </div>
@@ -80,18 +86,19 @@ export default {
   methods: {
     ...mapActions(userStore, ['logout']),
 
+    closeWindow() {
+      this.$refs.window.showWindow = false;
+    },
+
     openModal() {
       this.$emit('openModal');
-
-      // Close the the window/popup from here (aka parent component)
-      this.$refs.window.showWindow = false;
+      this.closeWindow();
     },
 
     logoutActions() {
       this.logout();
-      this.$refs.window.showWindow = false;
-
-      this.$router.push('/');
+      this.closeWindow();
+      this.$router.push('/global');
     },
 
     updateWindowSize() {
@@ -104,39 +111,42 @@ export default {
 
 <style scoped>
 .options-container {
-  padding: 16px;
+  padding: 8px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
 
-  div {
+  .item {
     display: flex;
-    padding: 8px 0 8px 12px;
+    align-items: center;
+    width: 100%;
+    gap: 12px;
+    font-size: 14px;
     cursor: pointer;
-    width: 120px;
+    padding: 6px 14px;
     border-radius: var(--radius-s);
-    background-color: var(--light-fg);
-    border: 1px solid rgba(255, 255, 255, 0.123);
-    transition: all 0.3s ease-out;
-
-    &:hover {
-      filter: brightness(1.3);
-    }
-
-    .logout-icon {
-      filter: invert(1);
-    }
-
-    svg {
-      margin-right: 16px;
-      width: 18px;
-      height: 18px;
-    }
 
     span {
-      font-size: 14px;
-      font-weight: 300;
+      flex: 1;
     }
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.171);
+    }
+  }
+
+  svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .logout-icon {
+    filter: invert(1);
+    height: 15px;
+  }
+
+  .login-icon {
+    height: 15px;
   }
 }
 </style>

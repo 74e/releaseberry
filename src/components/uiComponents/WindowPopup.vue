@@ -17,10 +17,10 @@
 </template>
 
 <script>
+import userStore from '@/state/userStore';
+
 export default {
   name: 'WindowPopup',
-
-  inject: ['accentColor'],
 
   provide() {
     return {
@@ -146,12 +146,16 @@ export default {
 
     borderStyle() {
       if (this.accentBorders.includes('none')) return '';
-      if (this.accentBorders.includes('faint')) {
-        return 'border: 1px solid rgba(255, 255, 255, 0.308);';
+
+      if (
+        this.accentBorders.includes('faint') ||
+        !userStore().user?.userPreferences?.accentBorders
+      ) {
+        return 'border: 1px solid rgba(255, 255, 255, 0.1);';
       }
 
       return this.accentBorders.reduce((border, selectedBorder) => {
-        return (border += `border-${selectedBorder}: ${this.borderWidth}px solid ${this.accentColor};`);
+        return (border += `border-${selectedBorder}: ${this.borderWidth}px solid rgba(var(--accentColor));`);
       }, '');
     },
 
@@ -265,7 +269,7 @@ export default {
   background-color: var(--dark-50);
   box-shadow: var(--shadow-default);
   border-radius: v-bind(borderRadiusSize);
-  transition: all v-bind(duration) ease-out;
+  transition: all 0.5s ease-out;
   backdrop-filter: blur(80px);
   z-index: 999;
 
@@ -283,6 +287,6 @@ export default {
 
 .fade-enter-active,
 .fade-leave-active {
-  transition: all v-bind(animaSpeed + 's') ease-out;
+  transition: all 0.4s ease-out;
 }
 </style>

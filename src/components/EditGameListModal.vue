@@ -87,8 +87,6 @@ import ConfirmationModal from './ConfirmationModal.vue';
 export default {
   name: 'EditGameListModal',
 
-  inject: ['accentColor'],
-
   components: { ModalPopup, WindowPopup, ConfirmationModal },
 
   data() {
@@ -274,7 +272,7 @@ export default {
     border: none;
     outline: none;
     font-size: 22px;
-    color: v-bind(accentColor);
+    color: rgba(var(--accentColor));
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -295,7 +293,7 @@ export default {
     }
 
     &.editing {
-      border-bottom: 1px solid v-bind(accentColor);
+      border-bottom: 1px solid rgba(var(--accentColor));
       margin-bottom: -1px;
     }
   }
@@ -315,7 +313,7 @@ export default {
   padding: 8px 12px 4px 12px;
   border: none;
   border: 1px solid rgba(255, 255, 255, 0.11);
-  border-bottom: 2px solid v-bind(accentColor);
+  border-bottom: 2px solid rgba(var(--accentColor));
   border-radius: 4px;
   background-color: var(--dark-100);
   color: var(--default-font-color);
@@ -343,12 +341,12 @@ export default {
 
     &:hover {
       background-color: rgba(255, 255, 255, 0.137);
-      border-color: v-bind(accentColor);
+      border-color: rgba(var(--accentColor));
     }
 
     &.active {
       background-color: rgba(255, 255, 255, 0.1);
-      border-color: v-bind(accentColor);
+      border-color: rgba(var(--accentColor));
 
       &::after {
         content: 'Added';
@@ -378,11 +376,6 @@ export default {
   .dot-menu-icon {
     width: 18px;
     height: 18px;
-    fill: rgba(255, 255, 255, 0.486);
-
-    &:hover {
-      fill: v-bind(accentColor);
-    }
   }
 
   .dropdown-container {

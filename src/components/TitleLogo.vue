@@ -14,9 +14,7 @@ export default {
     global: {
       default: false
     }
-  },
-
-  inject: ['accentColor', 'backgroundColor', 'backgroundPosition', 'duration']
+  }
 };
 </script>
 
@@ -82,7 +80,7 @@ export default {
 .releaseberry-logo,
 .fancy-text {
   cursor: pointer;
-  transition: all v-bind(duration + 's') ease-out;
+  transition: all 0.3 ease-out;
   &:hover {
     filter: var(--hover-filter-effect);
   }
@@ -90,16 +88,8 @@ export default {
 
 .fancy-text {
   font-family: var(--font-style-mplus);
-  background: linear-gradient(
-    92.72deg,
-    #6568ed -0.12%,
-    var(--accent) 40.81%,
-    #6568ed 60.12%,
-    v-bind(backgroundColor) 100%
-  );
+  background: linear-gradient(92.72deg, #6568ed 0%, rgba(var(--accentColor)) 100%);
   background-clip: text;
-  background-size: 250%;
-  background-position: v-bind(backgroundPosition);
   color: transparent;
 }
 </style>

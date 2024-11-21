@@ -116,8 +116,6 @@ export default {
     ButtonComponent
   },
 
-  inject: ['accentColor'],
-
   provide() {
     return {
       handleProgression: this.handleProgression
@@ -228,7 +226,7 @@ export default {
     font-size: 24px;
     padding-left: 8px;
     margin: 4px;
-    color: v-bind(accentColor);
+    color: rgba(var(--accentColor));
   }
 
   span {
@@ -243,8 +241,8 @@ export default {
     background: linear-gradient(
       90deg,
       rgba(0, 240, 255, 0) 0%,
-      v-bind(accentColor) 13%,
-      v-bind(accentColor) 87%,
+      rgba(var(--accentColor)) 13%,
+      rgba(var(--accentColor)) 87%,
       rgba(0, 144, 153, 0) 100%
     );
   }

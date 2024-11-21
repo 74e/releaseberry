@@ -23,6 +23,7 @@ import { RouterView } from 'vue-router';
 import NavbarMenu from './components/NavbarMenu.vue';
 import ToasterComponent from './components/ToasterComponent.vue';
 import ProfileImagePreloader from './components/ProfileImagePreloader.vue';
+import cc from './helperFunctions/color';
 
 export default {
   components: {
@@ -30,15 +31,6 @@ export default {
     NavbarMenu,
     ToasterComponent,
     ProfileImagePreloader
-  },
-
-  provide() {
-    return {
-      accentColor: this.accentColor,
-      backgroundColor: this.backgroundColor,
-      backgroundPosition: this.backgroundPosition,
-      duration: this.duration
-    };
   },
 
   data() {
@@ -52,12 +44,19 @@ export default {
   },
 
   computed: {
-    ...mapState(colorStore, [
-      'accentColor',
-      'backgroundColor',
-      'backgroundPosition',
-      'duration'
-    ])
+    ...mapState(colorStore, ['accentColor'])
+  },
+
+  watch: {
+    accentColor: {
+      handler() {
+        document.documentElement.style.setProperty(
+          '--accentColor',
+          cc.hexToRgb(this.accentColor)
+        );
+      },
+      immediate: true
+    }
   },
 
   methods: {
@@ -82,6 +81,7 @@ export default {
         } catch (error) {
           toastStore().handleErrorMessage(error, `Something went wrong, couldn't login`);
           this.logout();
+          this.$router.push('/global');
         }
       }
 
@@ -94,6 +94,8 @@ export default {
 <style>
 .page-container {
   padding: 0 0 0 45px;
+  margin: auto;
+  /* max-width: 1920px; */
 
   @media (max-width: 750px) {
     padding: 0 0 45px 0;
@@ -112,23 +114,23 @@ export default {
 
 svg {
   cursor: pointer;
-  transition: all v-bind(duration + 's') ease-out;
+  transition: all 0.4s ease-out;
 
   &:hover {
     filter: var(--hover-filter-effect);
   }
 
   &.fill {
-    fill: v-bind(accentColor);
+    fill: rgba(var(--accentColor));
   }
 
   &.stroke {
-    stroke: v-bind(accentColor);
+    stroke: rgba(var(--accentColor));
   }
 }
 
 .accent-text {
-  color: v-bind(accentColor);
+  color: rgba(var(--accentColor));
 }
 
 .temporaryBG {

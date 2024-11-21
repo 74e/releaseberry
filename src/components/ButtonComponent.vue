@@ -8,8 +8,6 @@
 export default {
   name: 'ButtonComponent',
 
-  inject: ['accentColor'],
-
   props: {
     size: {
       default: 'm',
@@ -18,9 +16,8 @@ export default {
     },
 
     minWidth: {
-      default: 100,
-      type: [Number, String],
-      validator: (value) => typeof value === 'number' || value === 'unset'
+      default: '100px',
+      type: [Number, String]
     }
   },
 
@@ -43,7 +40,7 @@ export default {
 <style scoped>
 button {
   width: max-content;
-  min-width: v-bind(minWidth + 'px');
+  min-width: v-bind(minWidth);
   background-color: rgba(255, 255, 255, 0.055);
   color: rgba(255, 255, 255, 0.534);
   border-radius: var(--radius-s);
@@ -60,8 +57,8 @@ button {
 
   &:hover {
     background-color: rgba(255, 255, 255, 0.12);
-    border-color: v-bind(accentColor);
-    color: v-bind(accentColor);
+    border-color: rgba(var(--accentColor));
+    color: rgba(var(--accentColor));
   }
 
   &:disabled {

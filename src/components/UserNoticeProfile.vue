@@ -1,8 +1,6 @@
 <template>
   <div class="notice-container">
     <div class="not-logged-in-notice">
-      <h1>Welcome to the profile page</h1>
-
       <div class="info-section">
         <h2>Login or create an account to view your profile!</h2>
         <span>
@@ -16,9 +14,7 @@
 
 <script>
 export default {
-  name: 'UserNoticeProfile',
-
-  inject: ['accentColor']
+  name: 'UserNoticeProfile'
 };
 </script>
 
@@ -40,7 +36,7 @@ export default {
       0px 8px 11px rgba(0, 0, 0, 0.25);
     backdrop-filter: blur(20px);
     border-radius: var(--radius-m);
-    border: solid v-bind(accentColor);
+    border: solid rgba(var(--accentColor));
     border-width: 0 2px;
 
     height: 600px;
@@ -57,9 +53,7 @@ export default {
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      border: 2px solid #565e6e4b;
       padding: 12px;
-      border-radius: var(--radius-l);
 
       h2 {
         font-size: 18px;

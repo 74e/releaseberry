@@ -101,11 +101,8 @@ export default {
     }
   },
 
-  inject: ['accentColor'],
-
   mounted() {
     this.initialize();
-    console.log(this.selectedGameCover);
   },
 
   data() {
@@ -436,7 +433,7 @@ export default {
     font-size: 16px;
     width: 100%;
     padding: 8px 16px;
-    border-bottom: 2px solid v-bind(accentColor);
+    border-bottom: 2px solid rgba(var(--accentColor));
     border-radius: 6px;
     box-shadow: var(--shadow-default);
     outline: none;

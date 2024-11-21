@@ -20,19 +20,17 @@ export default {
     }
   },
 
-  inject: ['accentColor'],
-
   computed: {
     value: {
       get() {
-        return this.modelValue
+        return this.modelValue;
       },
       set(value) {
-        this.$emit('update:modelValue', value)
+        this.$emit('update:modelValue', value);
       }
     }
   }
-}
+};
 </script>
 
 <style scoped>
@@ -73,7 +71,7 @@ input:checked {
   + .switch {
     grid-template-columns: 1fr 1fr 0fr;
     &::after {
-      background-color: v-bind(accentColor);
+      background-color: rgba(var(--accentColor));
     }
   }
 }

@@ -2,31 +2,28 @@
   <div @click.self="cancel" class="backdrop">
     <div class="popup-box">
       <CloseIcon @click="cancel" />
-      <div class="modal-heading">Users following this game ({{ followers.length }})</div>
+      <div class="modal-heading">{{ heading }} ({{ userList.length }})</div>
 
       <div class="line" />
 
-      <div class="follows-container">
-        <RouterLink
-          class="follower-item"
-          v-for="follow in followers"
-          :to="`/user/${follow.user.handle}`"
-          :key="follow.user.id"
-        >
-          <div class="profile-image">
-            <img :src="profileImages[follow.user.image_index]" alt="Profile Image" />
-          </div>
+      <div class="list-container">
+        <template v-for="user in userList" :key="user?.id">
+          <RouterLink v-if="user" class="list-item" :to="`/user/${user.handle}`">
+            <div class="profile-image">
+              <img :src="profileImages[user.image_index]" alt="Profile Image" />
+            </div>
 
-          <div class="profile-details">
-            <h2>{{ follow.user.username }}</h2>
-            <span>@{{ follow.user.handle }}</span>
-          </div>
+            <div class="profile-details">
+              <h2>{{ user.username }}</h2>
+              <span>@{{ user.handle }}</span>
+            </div>
 
-          <div class="level-display">
-            <span class="level-label">LEVEL</span>
-            <span class="level">{{ follow.user.level }}</span>
-          </div>
-        </RouterLink>
+            <div class="level-display">
+              <span class="level-label">LEVEL</span>
+              <span class="level">{{ user.level }}</span>
+            </div>
+          </RouterLink>
+        </template>
       </div>
     </div>
   </div>
@@ -34,11 +31,11 @@
 
 <script>
 export default {
-  name: 'UserFollowingGameModal',
+  name: 'UserListModal',
 
-  props: ['followers'],
+  props: ['userList', 'heading'],
 
-  inject: ['accentColor', 'profileImages'],
+  inject: ['profileImages'],
 
   methods: {
     cancel() {
@@ -53,6 +50,7 @@ export default {
   position: fixed;
   background-color: rgba(0, 0, 0, 0.26);
   inset: -4000px;
+  z-index: 1000;
 
   .popup-box {
     display: flex;
@@ -101,12 +99,12 @@ export default {
   .level {
     font-size: 26px;
     font-weight: 500;
-    color: v-bind(accentColor);
+    color: rgba(var(--accentColor));
   }
 }
 
 .modal-heading {
-  color: v-bind(accentColor);
+  color: rgba(var(--accentColor));
   padding: 0 20px;
   font-weight: 500;
   font-size: 18px;
@@ -119,13 +117,13 @@ export default {
   background: linear-gradient(
     90deg,
     rgba(0, 240, 255, 0) 0%,
-    v-bind(accentColor) 8%,
-    v-bind(accentColor) 17%,
+    rgba(var(--accentColor)) 8%,
+    rgba(var(--accentColor)) 17%,
     rgba(0, 144, 153, 0) 100%
   );
 }
 
-.follows-container {
+.list-container {
   display: flex;
   flex-wrap: wrap;
   padding: 8px 12px;
@@ -134,7 +132,7 @@ export default {
   gap: 12px;
 }
 
-.follower-item {
+.list-item {
   display: flex;
   align-items: center;
   padding: 8px;
@@ -147,7 +145,7 @@ export default {
 
   &:hover {
     background-color: rgba(255, 255, 255, 0.137);
-    border-color: v-bind(accentColor);
+    border-color: rgba(var(--accentColor));
   }
 
   @media (max-width: 585px) {

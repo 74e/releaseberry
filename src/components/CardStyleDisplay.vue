@@ -77,8 +77,6 @@ export default {
 
   props: ['displayData'],
 
-  inject: ['accentColor'],
-
   data() {
     return {
       selectedCard: null,
@@ -201,7 +199,7 @@ export default {
 
         svg {
           &.fill {
-            fill: v-bind(accentColor);
+            fill: rgba(var(--accentColor));
           }
         }
       }

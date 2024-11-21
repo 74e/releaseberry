@@ -1,43 +1,42 @@
-import { defineStore } from 'pinia'
+import { defineStore } from 'pinia';
 
 export const toastStore = defineStore('toaster', {
   state: () => ({ id: 0, toasts: [], timer: null }),
 
   actions: {
     add(options) {
-      const defaults = { id: ++this.id }
-      const toast = { ...defaults, ...options }
+      const toast = { id: ++this.id, ...options };
 
-      this.toasts.unshift(toast)
+      this.toasts.unshift(toast);
 
-      this.addToRemoveQueue(toast.duration)
+      this.addToRemoveQueue(toast.duration);
     },
 
     addToRemoveQueue(duration = 3000) {
-      clearTimeout(this.timer)
+      clearTimeout(this.timer);
 
       this.timer = setTimeout(() => {
-        this.remove()
-        this.resume()
-      }, duration)
+        this.remove();
+        this.resume();
+      }, duration);
     },
 
     remove() {
-      this.toasts.shift()
+      this.toasts.shift();
     },
 
     pause() {
-      clearTimeout(this.timer)
+      clearTimeout(this.timer);
     },
 
     resume() {
       if (this.toasts.length > 0) {
-        this.addToRemoveQueue()
+        this.addToRemoveQueue();
       }
     },
 
     clear() {
-      this.toasts = []
+      this.toasts = [];
     },
 
     handleErrorMessage(
@@ -45,15 +44,15 @@ export const toastStore = defineStore('toaster', {
       defaultError = 'Something went wrong',
       icon = 'NoticeIcon'
     ) {
-      let message
+      let message;
 
       if (error.response) {
-        message = error.response.data.error
+        message = error.response.data.error;
       } else {
-        message = defaultError
+        message = defaultError;
       }
 
-      this.add({ icon, message })
+      this.add({ icon, message });
     }
   }
-})
+});

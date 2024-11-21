@@ -181,10 +181,11 @@ export default {
 
     startCountdown() {
       clearInterval(this.countdown);
-      if (this.notCountdownable) return;
 
       const now = new Date();
       this.diff = this.releaseDate - now;
+
+      if (this.notCountdownable) return;
 
       this.countdown = setInterval(() => {
         const now = new Date();

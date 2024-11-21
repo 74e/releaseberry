@@ -50,7 +50,7 @@ export default {
     VerficationInput
   },
 
-  inject: ['hide', 'accentColor'],
+  inject: ['hide'],
 
   data() {
     return {
@@ -216,7 +216,7 @@ export default {
 
     .logo-text {
       font-family: var(--font-style-mplus);
-      color: v-bind(accentColor);
+      color: rgba(var(--accentColor));
     }
   }
 

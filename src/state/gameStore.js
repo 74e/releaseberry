@@ -14,7 +14,8 @@ const gameStore = defineStore('Game', {
     totalCovers: 0,
     activeGameListId: null,
     editingGameListId: null,
-    filterLibraryOptions: { releaseStatus: 'all', option: null, order: 'asc' }
+    filterLibraryOptions: { status: 'all', option: null, order: 'asc' },
+    filterSearchTerm: ''
   }),
 
   getters: {
@@ -80,13 +81,25 @@ const gameStore = defineStore('Game', {
       }
     },
 
-    async collectExperience(custom_game_config_id, experience) {
-      // Do something when collecting XP
-      const user = userStore().user;
+    async collectExperience(custom_game_config_id, expAfterCollection) {
+      try {
+        await gameService.collectExperience(custom_game_config_id);
+        const game = this.ownGames.find(
+          ({ cardData }) => cardData.custom_game_config_id === custom_game_config_id
+        );
 
-      console.log(user, custom_game_config_id, experience);
+        game.cardData.release_collected = true;
+        this.collectableGames = this.collectableGames.filter(
+          (id) => id !== custom_game_config_id
+        );
 
-      // const { data } = await gameService.collectExperience(custom_game_config_id);
+        const user = userStore().user;
+        user.xp = expAfterCollection;
+        user.level = Math.floor(expAfterCollection / 2440) + 1;
+      } catch (error) {
+        console.error(error);
+        throw error;
+      }
     },
 
     clearSearchResults() {
@@ -112,7 +125,7 @@ const gameStore = defineStore('Game', {
 
     async addSteamGame({ gameData, cardData }) {
       try {
-        const index = this.createNewIndex(this.ownGames[0].cardData);
+        const index = this.createNewIndex(this.ownGames[0]?.cardData);
         const { data } = await gameService.addSteamGame({
           gameData,
           cardData,
@@ -124,6 +137,20 @@ const gameStore = defineStore('Game', {
         }
 
         this.ownGames.unshift(data);
+      } catch (error) {
+        console.error(error);
+        throw error;
+      }
+    },
+
+    async adminDeleteSteamGame(gameId) {
+      try {
+        await gameService.adminDeleteSteamGame(gameId);
+
+        this.globalGames = this.globalGames.filter(
+          ({ gameData }) => gameData.id != gameId
+        );
+        this.ownGames = this.ownGames.filter(({ gameData }) => gameData.id != gameId);
       } catch (error) {
         console.error(error);
         throw error;
@@ -205,7 +232,7 @@ const gameStore = defineStore('Game', {
 
     async addGameAndCopyPreset({ gameId, customGameConfigId }) {
       try {
-        const index = this.createNewIndex(this.ownGames[0].cardData);
+        const index = this.createNewIndex(this.ownGames[0]?.cardData);
         const { data } = await gameService.addGameAndCopyPreset({
           gameId,
           customGameConfigId,
@@ -321,19 +348,25 @@ const gameStore = defineStore('Game', {
       }
     },
 
-    shuffle() {
-      for (let i = this.ownGames.length - 1; i > 0; i--) {
-        const randomNum = Math.floor(Math.random() * (i + 1));
-        const temprorary = this.ownGames[i].cardData.index;
-        this.ownGames[i].cardData.index = this.ownGames[randomNum].cardData.index;
-        this.ownGames[randomNum].cardData.index = temprorary;
-      }
-    },
-
     calculateAccumulatedExp(releaseDate, followedDate) {
-      console.log(releaseDate, followedDate, 'releaseDate, followedDate');
+      const now = new Date();
+      const createAt = new Date(followedDate);
+      const dayInMs = 1000 * 60 * 60 * 24;
+      const expPerDay = 20;
+      const accumulatedExpSinceCreated = Math.floor(
+        ((now - createAt) / dayInMs) * expPerDay
+      );
 
-      return 234;
+      const isValidRelease = releaseDate.match(/[a-z]/i);
+      if (isValidRelease || releaseDate?.length === 4) return accumulatedExpSinceCreated;
+
+      const releaseAt = new Date(Number(releaseDate));
+      if (createAt > releaseAt) return false;
+
+      const endDate = releaseAt > now ? now : releaseAt;
+      const expUntilRelease = Math.floor((endDate - createAt) / dayInMs) * expPerDay;
+
+      return expUntilRelease;
     },
 
     convertToDate(time) {

@@ -54,7 +54,7 @@ import { mapActions, mapState } from 'pinia';
 export default {
   name: 'LoginForm',
 
-  inject: ['hide', 'accentColor'],
+  inject: ['hide'],
 
   data() {
     return {
@@ -153,7 +153,7 @@ export default {
 
     .logo-text {
       font-family: var(--font-style-mplus);
-      background: v-bind(accentColor);
+      background: rgba(var(--accentColor));
       background-clip: text;
       background-position: v-bind(backgroundPosition);
       color: transparent;
@@ -190,7 +190,7 @@ export default {
         outline: none;
 
         &:focus {
-          outline: 1px solid v-bind(accentColor + '90');
+          outline: 1px solid rgba(var(--accentColor), 0.55);
         }
       }
     }
@@ -200,7 +200,7 @@ export default {
       margin-top: 8px;
 
       border-radius: var(--radius-s);
-      background-color: v-bind(accentColor);
+      background-color: rgba(var(--accentColor));
       border: none;
       color: #d0dadf;
       font-size: 16px;
@@ -226,7 +226,7 @@ export default {
     font-size: 14px;
 
     .redirect {
-      color: v-bind(accentColor);
+      color: rgba(var(--accentColor));
       cursor: pointer;
       text-decoration: underline;
     }
@@ -253,7 +253,7 @@ export default {
   p {
     font-size: 32px;
     font-weight: 500;
-    color: v-bind(accentColor);
+    color: rgba(var(--accentColor));
   }
 }
 </style>

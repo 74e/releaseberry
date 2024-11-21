@@ -30,6 +30,10 @@
           v-model:selectedValue="selectedCardConfig"
           :optionValues="availableCardConfigs"
         />
+
+        <ButtonComponent minWidth="230px" size="s" @click="initCreateNewConfig">
+          Create new preset
+        </ButtonComponent>
       </div>
 
       <div v-else-if="editableCardData" ref="editontainer" class="edit-area">
@@ -48,7 +52,16 @@
         <div class="btn-menu">
           <ButtonComponent size="s" @click="cancelEdit">Cancel</ButtonComponent>
 
+          <ButtonComponent
+            v-if="isCreatingNewPreset"
+            size="s"
+            @click="confirmAsNewConfig"
+          >
+            Save
+          </ButtonComponent>
+
           <WindowPopup
+            v-else
             ref="optionWindow"
             position="top-left"
             width="250"
@@ -112,12 +125,12 @@ import { toastStore } from '../state/toastStore';
 import { mapActions, mapState } from 'pinia';
 import DropDown from './uiComponents/DropDown.vue';
 import PresetTemplateRender from './PresetTemplateRender.vue';
-import { toRaw } from 'vue';
 import ButtonComponent from './ButtonComponent.vue';
 import WindowPopup from './uiComponents/WindowPopup.vue';
 import NewPresetNameConfirmation from './NewPresetNameConfirmation.vue';
 import ConfirmationModal from './ConfirmationModal.vue';
 import SelectGameCover from './SelectGameCover.vue';
+import _ from 'lodash';
 
 export default {
   name: 'UserCardEditArea',
@@ -142,8 +155,6 @@ export default {
 
   props: ['displayData'],
 
-  inject: ['accentColor'],
-
   data() {
     return {
       selectedCard: null,
@@ -157,6 +168,7 @@ export default {
       showConfirmationModal: false,
       showDeleteModal: false,
       counterFormat: null,
+      isCreatingNewPreset: false,
       isLoading: false,
       availableTimerFormats: [
         'DDD:HH:MM:SS',
@@ -251,6 +263,11 @@ export default {
       }
     },
 
+    initCreateNewConfig() {
+      this.isCreatingNewPreset = true;
+      this.initEdit();
+    },
+
     async switchConfig(triggerFetch = true) {
       const customGameConfigId = this.cardData.custom_game_config_id;
       const cardConfigId = this.selectedCardConfig.id;
@@ -284,13 +301,13 @@ export default {
     },
 
     initEdit() {
-      this.editableCardData = structuredClone(toRaw(this.cardData));
+      this.editableCardData = _.cloneDeep(this.cardData);
       this.currentPresetName = this.editableCardData.config.name;
       this.$emit('updateEditableCardData', this.editableCardData);
     },
 
     initEditImage() {
-      this.editableGameData = structuredClone(toRaw(this.gameData));
+      this.editableGameData = _.cloneDeep(this.gameData);
       this.$emit('updateEditableGameData', this.editableGameData);
     },
 
@@ -315,8 +332,16 @@ export default {
       const { config, card_component, card_name, countdown_format } =
         this.editableCardData;
 
+      if (this.isCreatingNewPreset && !config.name) {
+        this.$refs.editontainer.scrollTo({ top: 0, behavior: 'smooth' });
+        this.noNameError = true;
+
+        return;
+      }
+
       this.isLoading = true;
       let hasFailed = { state: false };
+      const presetName = this.isCreatingNewPreset ? config.name : newPresetName;
 
       try {
         const selectedData = await this.updateCustomGameConfigWithNewCardConfig({
@@ -327,16 +352,17 @@ export default {
             card_name,
             card_config: {
               ...config,
-              name: newPresetName
+              name: presetName
             }
           }
         });
 
         this.selectedCardConfig = selectedData;
+        this.isCreatingNewPreset = false;
 
         toastStore().add({
           icon: 'SaveIcon',
-          message: 'Saved as new preset'
+          message: `Saved new preset <b>${presetName}</b>`
         });
       } catch (error) {
         hasFailed.state = true;
@@ -545,7 +571,7 @@ export default {
     font-size: 16px;
     width: 100%;
     padding: 8px 16px;
-    border-bottom: 2px solid v-bind(accentColor);
+    border-bottom: 2px solid rgba(var(--accentColor));
     border-radius: 6px;
     box-shadow: var(--shadow-default);
     outline: none;
