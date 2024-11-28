@@ -1,6 +1,5 @@
 <template>
-  <main>
-    <TitleLogo :global="true" />
+  <div class="root">
     <SearchField />
     <div class="card-display-container">
       <component
@@ -21,7 +20,7 @@
         :clickOutside="true"
       />
     </Transition>
-  </main>
+  </div>
 </template>
 
 <script>
@@ -32,7 +31,7 @@ import gameStore from '@/state/gameStore';
 import { mapState, mapActions } from 'pinia';
 
 export default {
-  name: 'MainView',
+  name: 'GlobalLibraryArea',
 
   components: {
     SearchField,
@@ -79,16 +78,6 @@ export default {
   gap: 48px;
   margin: 30px auto;
 
-  width: 80%;
-}
-
-main {
-  min-height: 100vh;
-  padding: 40px 16px;
-  margin: auto;
-
-  @media (max-width: 500px) {
-    padding: 16px;
-  }
+  width: 95%;
 }
 </style>

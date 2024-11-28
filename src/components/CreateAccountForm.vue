@@ -159,7 +159,7 @@ export default {
         try {
           await this.createAccount(formDetails);
 
-          this.$router.push('/');
+          this.$router.push('/library');
           this.hide();
           this.$emit('redirect');
         } catch (error) {

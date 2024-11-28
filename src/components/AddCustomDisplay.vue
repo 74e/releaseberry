@@ -17,8 +17,10 @@
     </Transition>
 
     <div class="btn-container">
-      <ButtonComponent v-if="currentTab === 2" @click="previous">Back</ButtonComponent>
-      <ButtonComponent @click="currentTab === 1 ? next() : handleSubmit()">
+      <ButtonComponent size="s" v-if="currentTab === 2" @click="previous">
+        Back
+      </ButtonComponent>
+      <ButtonComponent size="s" @click="currentTab === 1 ? next() : handleSubmit()">
         {{ currentTab === 1 ? 'Next' : 'Confirm' }}
       </ButtonComponent>
     </div>
@@ -33,7 +35,6 @@ import SelectGameStyle from './SelectGameStyle.vue';
 import ButtonComponent from './ButtonComponent.vue';
 import LoadingOverlay from './uiComponents/LoadingOverlay.vue';
 import gameStore from '../state/gameStore';
-import cardStore from '../state/cardStore';
 import { toastStore } from '../state/toastStore';
 import { mapActions } from 'pinia';
 
@@ -72,7 +73,6 @@ export default {
 
   methods: {
     ...mapActions(gameStore, ['addSteamGame']),
-    ...mapActions(cardStore, ['getUserCardConfigurations']),
 
     handleTabClick(index) {
       if (this.openTab <= index) return;
@@ -96,7 +96,6 @@ export default {
       try {
         this.isLoading = true;
         await this.addSteamGame(payload);
-        await this.getUserCardConfigurations();
 
         toastStore().add({
           icon: 'LibraryIcon',

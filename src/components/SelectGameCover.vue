@@ -59,7 +59,7 @@
               and help the community by adding your game cover there!
             </p>
 
-            <ButtonComponent @click="toggleCustomImageView">
+            <ButtonComponent size="s" @click="toggleCustomImageView">
               Add custom image
             </ButtonComponent>
           </div>

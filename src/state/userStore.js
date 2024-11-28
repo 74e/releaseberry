@@ -8,6 +8,7 @@ import colorStore from './colorStore';
 const userStore = defineStore('User', {
   state: () => ({
     user: null,
+    userFeed: null,
     userProfile: null,
     userCredentials: null
   }),
@@ -15,8 +16,7 @@ const userStore = defineStore('User', {
   getters: {
     loggedInUser: (state) => state.user,
     username: (state) => state.user?.username,
-    userHandle: (state) => state.user?.handle,
-    currentUserProfile: (state) => state.userProfile
+    userHandle: (state) => state.user?.handle
   },
 
   actions: {
@@ -156,6 +156,26 @@ const userStore = defineStore('User', {
       try {
         const { data } = await userService.getUserProfile(handle);
         this.userProfile = data;
+      } catch (error) {
+        console.error(error);
+        throw error;
+      }
+    },
+
+    async getUserFeed() {
+      try {
+        const { data } = await userService.getUserFeed();
+        this.userFeed = data;
+      } catch (error) {
+        console.error(error);
+        throw error;
+      }
+    },
+
+    async getLeaderboardData() {
+      try {
+        const { data } = await userService.getLeaderboardData();
+        return data;
       } catch (error) {
         console.error(error);
         throw error;

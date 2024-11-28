@@ -124,7 +124,7 @@ export default {
 
       if (
         this.accentBorders.includes('faint') ||
-        !userStore().user?.userPreferences?.accentBorders
+        userStore()?.user?.userPreferences?.accentBorders === false
       ) {
         return 'border: 1px solid rgba(255, 255, 255, 0.1);';
       }

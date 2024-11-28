@@ -18,6 +18,7 @@
         :key="toast.id"
         :class="['toaster-item', { overlap: index > 2 }]"
         :style="[
+          borderStyle,
           index === 0
             ? { zIndex: toast.id }
             : {
@@ -44,6 +45,7 @@
 <script>
 import { mapActions } from 'pinia';
 import { toastStore } from '../state/toastStore';
+import userStore from '@/state/userStore';
 
 export default {
   name: 'ToasterComponent',
@@ -78,6 +80,13 @@ export default {
   computed: {
     toasts() {
       return toastStore().toasts;
+    },
+
+    borderStyle() {
+      if (userStore()?.user?.userPreferences?.accentBorders === false) {
+        return `border: 1px solid rgba(130, 130, 130, 0.25);`;
+      }
+      return `border-top: 2px solid rgba(var(--accentColor));`;
     }
   },
 
@@ -159,7 +168,6 @@ export default {
   cursor: pointer;
   user-select: none;
   border-radius: var(--radius-m);
-  border-top: 2px solid rgba(var(--accentColor));
   background-color: var(--dark-50);
   padding: 4px;
   font-weight: 500;

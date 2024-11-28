@@ -28,9 +28,10 @@ const cardStore = defineStore('Card', {
       try {
         const { data } = await cardService.addCardConfig(cardConfigId);
 
-        this.cardConfigs.forEach((card) => {
-          if (card.card_component === cardComponent) {
-            card.card_config.push(data);
+        this.cardConfigs.some((cardType) => {
+          if (cardType.card_component === cardComponent) {
+            cardType.card_config.push(data);
+            return true;
           }
         });
       } catch (error) {
@@ -42,7 +43,6 @@ const cardStore = defineStore('Card', {
     async getUserCardConfigurations(userId = null) {
       try {
         if (!userId) userId = userStore().loggedInUser.id;
-
         const { data } = await cardService.getUserCardConfigurations(userId);
         this.cardConfigs = data;
       } catch (error) {

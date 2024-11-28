@@ -46,11 +46,12 @@
               />
 
               <div class="btn-container">
-                <ButtonComponent @click="handleProgression('previous')">
+                <ButtonComponent size="s" @click="handleProgression('previous')">
                   Back
                 </ButtonComponent>
 
                 <ButtonComponent
+                  size="s"
                   :disabled="!selectedGameCover"
                   @click="handleProgression('next')"
                 >
@@ -76,11 +77,13 @@
               />
 
               <div class="btn-container">
-                <ButtonComponent @click="handleProgression('previous')">
+                <ButtonComponent size="s" @click="handleProgression('previous')">
                   Back
                 </ButtonComponent>
 
-                <ButtonComponent @click="handleSubmit"> Confirm </ButtonComponent>
+                <ButtonComponent size="s" @click="handleSubmit">
+                  Confirm
+                </ButtonComponent>
               </div>
             </div>
           </template>

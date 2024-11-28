@@ -14,6 +14,7 @@
           <component
             :is="property.componentType"
             :orignialObj="property"
+            :alphaChannel="true"
             v-model="property.value"
           />
         </template>

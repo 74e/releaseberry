@@ -1,13 +1,14 @@
 <template>
   <ul class="settings-list">
-    <li
-      v-for="setting in settings"
-      :key="setting.component"
-      @click="changeSettingsView(setting.component)"
-      :class="['settings-item', { active: openSetting == setting.component }]"
-    >
-      {{ setting.label }}
-    </li>
+    <template v-for="setting in settings" :key="setting.component">
+      <li
+        v-if="setting.permission.includes(userRole)"
+        @click="changeSettingsView(setting.component)"
+        :class="['settings-item', { active: openSetting == setting.component }]"
+      >
+        {{ setting.label }}
+      </li>
+    </template>
   </ul>
 </template>
 
@@ -15,7 +16,7 @@
 export default {
   name: 'SettingsList',
 
-  props: ['openSetting', 'settings'],
+  props: ['openSetting', 'settings', 'userRole'],
 
   mounted() {
     this.changeSettingsView(this.settings[0].component);

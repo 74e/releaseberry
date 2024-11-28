@@ -16,7 +16,6 @@
 <script>
 import colorStore from './state/colorStore';
 import userStore from './state/userStore';
-import cardStore from './state/cardStore';
 import { toastStore } from './state/toastStore';
 import { mapState, mapActions } from 'pinia';
 import { RouterView } from 'vue-router';
@@ -61,7 +60,6 @@ export default {
 
   methods: {
     ...mapActions(userStore, ['persistentLogin', 'logout']),
-    ...mapActions(cardStore, ['getUserCardConfigurations']),
 
     /*
      * TODO: Add fancy loading screen animation
@@ -81,7 +79,7 @@ export default {
         } catch (error) {
           toastStore().handleErrorMessage(error, `Something went wrong, couldn't login`);
           this.logout();
-          this.$router.push('/global');
+          this.$router.push('/main');
         }
       }
 

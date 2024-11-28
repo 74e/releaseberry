@@ -2,54 +2,51 @@
   <div class="releaseberry-logo-container">
     <h1 class="releaseberry-logo fancy-text">RELEASE BERRY</h1>
     <ReleaseBerryIcon />
-    <span v-if="global" class="global fancy-text">Global Library</span>
   </div>
 </template>
 
-<script>
-export default {
-  name: 'TitleLogo',
-
-  props: {
-    global: {
-      default: false
-    }
-  }
-};
+<script setup>
+import { computed } from 'vue';
+const props = defineProps(['margin']);
+const nameAndCountry = computed(() => (props.margin == 's' ? '20px' : '40px'));
 </script>
 
 <style scoped>
 .releaseberry-logo-container {
   width: fit-content;
   margin: auto;
-  margin-bottom: 40px;
+  margin-bottom: v-bind(nameAndCountry);
 
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
 
+  animation: waveAnim forwards 6s infinite;
+  animation-timing-function: ease-in-out;
+  cursor: default;
+  user-select: none;
+
   .releaseberry-logo {
     font-weight: 400;
     font-size: 54px;
     line-height: 86.85%;
+    font-family: var(--font-style-mplus);
+    background: linear-gradient(92.72deg, #6568ed 0%, rgba(var(--accentColor)) 100%);
+    background-clip: text;
+    color: transparent;
+
+    animation: waveAnim forwards 6s infinite;
+    animation-timing-function: ease-in-out;
   }
 
   .releaseberry-icon {
     width: 41.28px;
     height: 48px;
+    cursor: default;
+    user-select: none;
 
     transform: rotate(34.14deg) translate(5px, -4px);
-  }
-
-  .global {
-    margin: auto;
-    display: inline-block;
-    position: absolute;
-    top: calc(100% + 2px);
-    font-size: 19px;
-    font-weight: bold;
-    opacity: 0.85;
   }
 
   @media (max-width: 500px) {
@@ -63,11 +60,6 @@ export default {
     .releaseberry-icon {
       display: none;
     }
-
-    .global {
-      top: 95%;
-      font-size: 16px;
-    }
   }
 
   @media (max-width: 350px) {
@@ -77,19 +69,20 @@ export default {
   }
 }
 
-.releaseberry-logo,
-.fancy-text {
-  cursor: pointer;
-  transition: all 0.3 ease-out;
-  &:hover {
-    filter: var(--hover-filter-effect);
+@keyframes waveAnim {
+  0%,
+  100% {
+    filter: brightness(1);
+    text-shadow:
+      0 0 70px rgba(var(--accentColor), 0.4),
+      0 0 70px rgba(var(--accentColor), 0.4);
   }
-}
 
-.fancy-text {
-  font-family: var(--font-style-mplus);
-  background: linear-gradient(92.72deg, #6568ed 0%, rgba(var(--accentColor)) 100%);
-  background-clip: text;
-  color: transparent;
+  50% {
+    filter: brightness(1.2);
+    text-shadow:
+      0 0 80px rgba(var(--accentColor), 0.8),
+      0 0 80px rgba(var(--accentColor), 0.8);
+  }
 }
 </style>

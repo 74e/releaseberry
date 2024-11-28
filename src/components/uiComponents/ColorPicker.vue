@@ -13,7 +13,7 @@
             default-format="hex"
             :visible-formats="visibleFormat"
             :color="color"
-            :alphaChannel="alphaChannel"
+            :alphaChannel="undefined"
             @color-change="updateColor"
           />
         </div>
@@ -54,7 +54,7 @@ export default {
 
     alphaChannel: {
       type: Boolean,
-      default: true
+      default: undefined
     }
   },
 

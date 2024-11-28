@@ -108,7 +108,7 @@ export default {
 
       setTimeout(() => {
         this.hide();
-        this.$router.push('/');
+        this.$router.push('/library');
       }, 2000);
     }
   }

@@ -45,9 +45,9 @@ export const toastStore = defineStore('toaster', {
       icon = 'NoticeIcon'
     ) {
       let message;
-
-      if (error.response) {
-        message = error.response.data.error;
+      const errorMsg = error.response?.data?.error;
+      if (errorMsg) {
+        message = errorMsg;
       } else {
         message = defaultError;
       }

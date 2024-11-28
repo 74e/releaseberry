@@ -212,7 +212,12 @@ export default {
   flex-wrap: wrap;
   gap: 48px;
   margin: 30px auto;
-  width: 80%;
+
+  /*
+  Might make this value dynamic.
+  letting users decide how wide the display area is
+   */
+  width: 95%;
 }
 
 .motion-move {

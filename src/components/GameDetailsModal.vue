@@ -1,19 +1,27 @@
 <template>
   <ModalPopup
     ref="modal"
-    @modalClosing="changeView('game')"
+    @modalClosing="changeView('GameDetailsDisplay')"
     :blur="true"
     :accentBorders="['right', 'left']"
   >
     <div v-if="displayData" class="content">
       <div class="top-controls">
         <ButtonComponent
-          @click="changeView(this.mode === 'game' ? 'card' : 'game')"
+          @click="
+            changeView(
+              this.mode === 'GameDetailsDisplay'
+                ? 'CardStyleDisplay'
+                : 'GameDetailsDisplay'
+            )
+          "
           :disabled="!cardData"
           size="s"
           minWidth="unset"
         >
-          {{ mode === 'game' ? 'Switch to Card tab' : 'Switch to Game tab' }}
+          {{
+            mode === 'GameDetailsDisplay' ? 'Switch to Card tab' : 'Switch to Game tab'
+          }}
         </ButtonComponent>
 
         <WindowPopup
@@ -48,25 +56,21 @@
       </div>
 
       <Transition name="fade" mode="out-in">
-        <GameDetailsDisplay v-if="mode === 'game'" :displayData="displayData" />
-
-        <CardStyleDisplay v-else-if="mode === 'card'" :displayData="displayData" />
-
-        <AddCustomDisplay
-          v-else-if="mode === 'custom'"
+        <component
+          :is="mode"
           :displayData="displayData"
-          @resetView="changeView('game')"
+          @resetView="changeView('GameDetailsDisplay')"
         />
       </Transition>
 
-      <div v-if="mode !== 'custom'" class="bottom-controls">
+      <div v-if="mode !== 'AddCustomDisplay'" class="bottom-controls">
         <div class="follow-count" @click="toggleFollowsModal">
           <span class="count">{{ follows.length }}</span>
           <span class="label">Following this {{ type }}</span>
           <ProfileIcon class="icon-label" />
         </div>
 
-        <AccumulatedXpDisplay v-if="showExp" :data="displayData" />
+        <AccumulatedXpDisplay :show="showExp" :data="displayData" />
 
         <WindowPopup
           position="top-left"
@@ -81,7 +85,11 @@
           <template #window>
             <div class="options-container">
               <template v-if="isUserLoggedIn">
-                <ButtonComponent @click="changeView('custom')" size="s" class="btn">
+                <ButtonComponent
+                  @click="changeView('AddCustomDisplay')"
+                  size="s"
+                  class="btn"
+                >
                   <PlusIcon />
                   <span>Add with custom style</span>
                 </ButtonComponent>
@@ -142,7 +150,6 @@ import UserListModal from './UserListModal.vue';
 import QuickAddGameListModal from './QuickAddGameListModal.vue';
 import AccumulatedXpDisplay from './AccumulatedXpDisplay.vue';
 import gameStore from '@/state/gameStore';
-import cardStore from '@/state/cardStore';
 import userStore from '@/state/userStore';
 import { toastStore } from '@/state/toastStore';
 import { mapActions, mapState } from 'pinia';
@@ -171,7 +178,7 @@ export default {
       showFollowsModal: false,
       showQuickAddModal: false,
       showAdminConfirmationModal: false,
-      mode: 'game'
+      mode: 'GameDetailsDisplay'
     };
   },
 
@@ -227,7 +234,6 @@ export default {
       'calculateAccumulatedExp',
       'adminDeleteSteamGame'
     ]),
-    ...mapActions(cardStore, ['getUserCardConfigurations']),
 
     async finalizeCompleteDeletion() {
       try {
@@ -277,7 +283,6 @@ export default {
           gameId: this.gameId,
           customGameConfigId: this.customGameConfigId
         });
-        await this.getUserCardConfigurations();
 
         const gameName = this.gameData.name;
         toastStore().add({

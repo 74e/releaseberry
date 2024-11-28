@@ -44,7 +44,7 @@ export default {
     async finalizeAccountDeletion() {
       try {
         await userStore().deleteAccount();
-        this.$router.push('/global');
+        this.$router.push('/main');
         toastStore().delete({
           icon: 'TrashIcon',
           message: 'Account has been <b>deleted</b> successfully'

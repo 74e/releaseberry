@@ -38,6 +38,7 @@
               label="Design Preset"
               targetDisplay="name"
               targetIdentifier="id"
+              tag="official"
               v-model:selectedValue="selectedConfig"
               :optionValues="availablePresets"
             />
@@ -226,10 +227,16 @@ export default {
       });
 
       // Get the new cards styles configs
-      this.availablePresets = this.card.card_config.map((cardConfig) => ({
-        name: cardConfig.config.name,
-        id: cardConfig.id
-      }));
+      this.availablePresets = this.card.card_config
+        .map((cardConfig) => ({
+          id: cardConfig.id,
+          name: cardConfig.config.name,
+          official: cardConfig.official
+        }))
+        .sort((a, b) => {
+          if (a.official === b.official) return 0;
+          return a.official ? -1 : 0;
+        });
 
       this.showEditArea = false;
       this.newPresetName = '';
@@ -307,7 +314,7 @@ export default {
     height: 460px;
   }
 
-  @media (max-height: 785px), (max-width: 1240px) {
+  @media (max-height: 785px), (max-width: 785px) {
     height: auto;
     flex-direction: column;
     gap: 0px;
@@ -319,7 +326,7 @@ export default {
   padding: 16px;
   align-content: center;
 
-  @media (max-width: 1240px) {
+  @media (max-width: 785px) {
     flex-direction: column;
     width: 100%;
   }
@@ -335,6 +342,7 @@ export default {
   width: 600px;
   padding: 16px;
   margin: auto;
+  height: 100%;
 
   @media (max-width: 785px) {
     overflow-y: auto;

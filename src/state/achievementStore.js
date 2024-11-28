@@ -41,12 +41,15 @@ const achievementStore = defineStore('achievement', () => {
       case 'game':
         return {
           GAME_ADD: library.length,
-          GAME_COLLECT: library.filter(({ cardData }) => cardData.release_collected)
-            .length
+          GAME_COLLECT: library.filter(({ cardData }) => {
+            return cardData.release_collected;
+          }).length
         };
       case 'card':
         return {
-          DESIGN_ADD: cardConfigs?.reduce((acc, item) => acc + item.card_config.length, 0)
+          DESIGN_ADD: cardConfigs?.reduce((acc, cardType) => {
+            return acc + cardType.card_config.filter((card) => !card.official).length;
+          }, 0)
         };
       case 'follow':
         return {

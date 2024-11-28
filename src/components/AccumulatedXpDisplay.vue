@@ -1,9 +1,15 @@
 <template>
   <div class="exp">
-    <span class="label">{{
-      label ? 'Accumulated Experience' : 'No Experience Available'
-    }}</span>
-    <span v-if="label" class="exp-count">{{ label }}</span>
+    <template v-if="show">
+      <span class="label">{{
+        label ? 'Accumulated Experience' : 'No Experience Available'
+      }}</span>
+      <span v-if="label" class="exp-count">{{ label }}</span>
+    </template>
+    <div v-else class="label">
+      Accumulated Experience <br />
+      only visible in your library.
+    </div>
   </div>
 </template>
 
@@ -13,7 +19,7 @@ import gameStore from '../state/gameStore';
 export default {
   name: 'AccumulatedXpDisplay',
 
-  props: ['data'],
+  props: ['data', 'show'],
 
   computed: {
     accumulatedExperience() {

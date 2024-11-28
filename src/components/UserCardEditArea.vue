@@ -27,6 +27,7 @@
           targetDisplay="name"
           targetIdentifier="id"
           @onSelect="switchConfig"
+          tag="official"
           v-model:selectedValue="selectedCardConfig"
           :optionValues="availableCardConfigs"
         />
@@ -218,9 +219,14 @@ export default {
       return this.userCardConfigs
         .find((c) => c.card_name === this.selectedCard.name)
         .card_config.map((c) => ({
+          id: c.id,
           name: c.config.name,
-          id: c.id
-        }));
+          official: c.official
+        }))
+        .sort((a, b) => {
+          if (a.official === b.official) return 0;
+          return a.official ? -1 : 0;
+        });
     }
   },
 

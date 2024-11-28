@@ -17,6 +17,7 @@
           :class="{ active: isActiveValue(option) }"
           :key="option"
         >
+          <div class="tag" v-if="option[tag]">{{ tag }}</div>
           {{ targetDisplay ? option[targetDisplay] : option }}
         </div>
       </div>
@@ -60,6 +61,11 @@ export default {
     },
 
     targetIdentifier: {
+      type: [String, null],
+      default: null
+    },
+
+    tag: {
       type: [String, null],
       default: null
     },
@@ -247,6 +253,16 @@ li {
         background-color: rgba(255, 255, 255, 0);
         transition: all 0.15s ease-out;
         position: relative;
+
+        .tag {
+          position: absolute;
+          top: 4px;
+          right: 8px;
+          font-size: 10px;
+          color: rgba(var(--accentColor), 0.9);
+          border-radius: 3px;
+          text-transform: capitalize;
+        }
 
         &:first-child {
           margin-top: 8px;

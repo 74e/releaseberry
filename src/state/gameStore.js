@@ -7,6 +7,7 @@ const gameStore = defineStore('Game', {
   state: () => ({
     gameLists: [],
     ownGames: [],
+    userProfileGames: [],
     globalGames: [],
     collectableGames: [],
     searchedGames: [],
@@ -45,11 +46,37 @@ const gameStore = defineStore('Game', {
   },
 
   actions: {
-    async getLibrary() {
+    async syncSteamGameIndex() {
       try {
-        const userId = userStore().loggedInUser.id;
+        const { data } = await gameService.syncSteamGameIndex();
+        return data;
+      } catch (error) {
+        console.error(error);
+        throw error;
+      }
+    },
+
+    async getIndexLogs() {
+      try {
+        const { data } = await gameService.getIndexLogs();
+        return data;
+      } catch (error) {
+        console.error(error);
+        throw error;
+      }
+    },
+
+    async getLibrary(id = undefined) {
+      let userId = id;
+      try {
+        if (!userId) userId = userStore().loggedInUser.id;
         const { data } = await gameService.getFollowedGamesFromUser(userId);
-        this.ownGames = data;
+
+        if (!id) {
+          this.ownGames = data;
+        } else {
+          this.userProfileGames = data;
+        }
       } catch (error) {
         console.error(error);
       }
@@ -132,9 +159,7 @@ const gameStore = defineStore('Game', {
           index
         });
 
-        if (!cardData.id) {
-          cardStore().getUserCardConfigurations();
-        }
+        if (!cardData.id) await cardStore().getUserCardConfigurations();
 
         this.ownGames.unshift(data);
       } catch (error) {
@@ -372,11 +397,14 @@ const gameStore = defineStore('Game', {
     convertToDate(time) {
       let date = new Date(Number(time));
       let day = date.getDate();
+      let isInvalid = false;
       const month = date.toLocaleString('default', { month: 'long' });
       const year = date.getFullYear();
       day = day += this.getNumberSuffix(day);
 
-      return { day, month, year };
+      if (isNaN(year)) isInvalid = true;
+
+      return { day, month, year, isInvalid };
     },
 
     getNumberSuffix(day) {

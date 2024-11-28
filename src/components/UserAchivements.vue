@@ -116,7 +116,7 @@ export default {
 
   methods: {
     async initAchievements() {
-      const id = userStore().currentUserProfile.id;
+      const id = userStore().userProfile.id;
       await this.achievementsApi.getUserAchievements(id);
     },
 

@@ -2,7 +2,7 @@
   <nav>
     <ul>
       <li>
-        <RouterLink to="/global">
+        <RouterLink to="/">
           <div class="icon-box">
             <ReleaseBerryIcon />
           </div>
@@ -10,7 +10,7 @@
       </li>
 
       <li>
-        <RouterLink to="/">
+        <RouterLink to="/library">
           <div class="icon-box">
             <LibraryIcon />
           </div>

@@ -1,6 +1,14 @@
 import { api } from './api';
 
 export default {
+  syncSteamGameIndex() {
+    return api.post('game/sync-index');
+  },
+
+  getIndexLogs() {
+    return api.get('game/get-index');
+  },
+
   getGlobalLibrary() {
     return api.get('game/library/global');
   },

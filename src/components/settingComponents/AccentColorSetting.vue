@@ -1,5 +1,5 @@
 <template>
-  <div class="accent-color-container">
+  <div v-if="colorPref" class="accent-color-container">
     <div class="select-color">
       <ColorPicker
         v-model="colorValue"
@@ -15,6 +15,9 @@
         <UpdateIcon />
       </div>
       <button class="save-btn" :disabled="isEditing" @click="saveNewColor">Save</button>
+      <button class="save-btn" :disabled="isDefaultColor" @click="saveNewColor(_, true)">
+        Reset
+      </button>
     </div>
     <p>
       Choose an accent color to personalize your profile and UI. Visitors to your profile
@@ -26,6 +29,7 @@
 
 <script>
 import userStore from '@/state/userStore';
+import colorStore from '@/state/colorStore';
 import ColorPicker from '../uiComponents/ColorPicker.vue';
 import cc from '@/helperFunctions/color';
 import { toastStore } from '@/state/toastStore';
@@ -52,6 +56,14 @@ export default {
 
     isEditing() {
       return this.colorPref == this.hexColor;
+    },
+
+    defaultColor() {
+      return colorStore().defaultColor;
+    },
+
+    isDefaultColor() {
+      return this.colorPref == this.defaultColor;
     }
   },
 
@@ -60,10 +72,13 @@ export default {
   },
 
   methods: {
-    async saveNewColor() {
-      try {
-        await userStore().updateUserPreferences({ accentColor: this.hexColor });
+    // ignoring first argument because vue makes it an event object by default
+    async saveNewColor(_, isReset) {
+      const color = isReset ? this.defaultColor : this.hexColor;
+      if (isReset) this.colorValue = cc.hexToRgba(this.defaultColor);
 
+      try {
+        await userStore().updateUserPreferences({ accentColor: color });
         toastStore().add({ icon: 'SaveIcon', message: 'Saved new accent color' });
       } catch (error) {
         toastStore().handleErrorMessage(error, 'Could not update accent color');
@@ -85,10 +100,18 @@ p {
   background: none;
 }
 
+.color-display {
+  width: max-content;
+}
+
 .select-color {
   display: flex;
   gap: 8px;
   margin-bottom: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.096);
+  border-radius: 8px;
+  padding-right: 16px;
+  width: max-content;
 
   .save-btn {
     margin-left: 8px;

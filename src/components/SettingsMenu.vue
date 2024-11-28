@@ -98,7 +98,7 @@ export default {
     logoutActions() {
       this.logout();
       this.closeWindow();
-      this.$router.push('/global');
+      this.$router.push('/main');
     },
 
     updateWindowSize() {

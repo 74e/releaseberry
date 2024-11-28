@@ -7,28 +7,38 @@
         <div @click="setActiveTab(1)" :class="['tab-btn', { active: activeTab === 1 }]">
           {{ tabName }}
         </div>
-        <div class="devider" />
+        <div class="divider" :style="dividerColor" />
         <div @click="setActiveTab(2)" :class="['tab-btn', { active: activeTab === 2 }]">
           Achievements
         </div>
       </div>
 
-      <Transition tag="div" name="fade" mode="out-in" v-if="gameItems" class="area">
-        <component :is="displayComponent" :gameItems="gameItems" @revert="revertView" />
+      <Transition tag="div" name="fade" mode="out-in" class="area">
+        <component v-if="userProfile" :is="displayComponent" @revert="revertView" />
       </Transition>
 
       <div v-if="userNotFound" class="not-found">Sorry, user not found</div>
     </div>
+    <Transition name="fade">
+      <GameDetailsModal
+        v-if="showGameModal"
+        v-model:showModal="showGameModal"
+        :displayData="displayData"
+        :clickOutside="true"
+      />
+    </Transition>
   </main>
 </template>
 
 <script>
 import userStore from '@/state/userStore';
+import colorStore from '@/state/colorStore';
 import { mapState, mapActions } from 'pinia';
 import UserProfileCard from '@/components/UserProfileCard.vue';
 import UserAchivements from '@/components/UserAchivements.vue';
-import UserLibrary from '@/components/UserLibrary.vue';
+import UserLibraryFeed from '@/components/UserLibraryFeed.vue';
 import UserFeed from '@/components/UserFeed.vue';
+import GameDetailsModal from '@/components/GameDetailsModal.vue';
 
 export default {
   name: 'ProfileView',
@@ -36,8 +46,9 @@ export default {
   components: {
     UserProfileCard,
     UserAchivements,
-    UserLibrary,
-    UserFeed
+    UserLibraryFeed,
+    UserFeed,
+    GameDetailsModal
   },
 
   /**
@@ -52,11 +63,19 @@ export default {
     }
   },
 
+  provide() {
+    return {
+      initDisplayGameDetails: this.initDisplayGameDetails
+    };
+  },
+
   data() {
     return {
       activeTab: 1,
       isUsersOwnPage: false,
-      userNotFound: false
+      userNotFound: false,
+      showGameModal: false,
+      displayData: null
     };
   },
 
@@ -68,25 +87,49 @@ export default {
     },
 
     displayComponent() {
-      const userView = this.isUsersOwnPage ? 'UserFeed' : 'UserLibrary';
+      const userView = this.isUsersOwnPage ? 'UserFeed' : 'UserLibraryFeed';
       return this.activeTab === 1 ? userView : 'UserAchivements';
     },
 
-    gameItems() {
-      return this.userProfile?.followedGames;
+    isAccentBorder() {
+      return userStore()?.user?.userPreferences?.accentBorders === false;
     },
 
     accentBorders() {
-      if (!userStore().user?.userPreferences?.accentBorders) {
+      if (this.isAccentBorder) {
         return 'border: 1px solid rgba(255, 255, 255, 0.1);';
       }
 
       return `border: solid rgba(var(--accentColor)); border-width: 2px 0;`;
+    },
+
+    dividerColor() {
+      if (this.isAccentBorder) {
+        return `background: linear-gradient(
+        180deg,
+        rgba(120,120,120, .2) 0%,
+        rgba(40, 53, 61, 0) 90%
+      );`;
+      }
+
+      return `background: linear-gradient(
+        180deg,
+        rgba(var(--accentColor)) 0%,
+        rgba(40, 53, 61, 0) 90%
+      );`;
+    },
+
+    userProfile() {
+      return userStore().userProfile;
     }
   },
 
   created() {
     this.initiateGetUserData();
+  },
+
+  unmounted() {
+    colorStore().setVisitedProfileColor();
   },
 
   methods: {
@@ -103,7 +146,7 @@ export default {
       const { handle } = this.$route.params;
 
       if (handle === '') {
-        this.$router.push('/');
+        this.$router.push('/main');
         return;
       }
 
@@ -111,8 +154,10 @@ export default {
       if (this.loggedInUser?.handle === handle) this.isUsersOwnPage = true;
 
       try {
-        // get pinia to fetch the user profile into state
         await this.getUserProfile(handle);
+
+        const color = this.userProfile.userPreferences.accentColor;
+        colorStore().setVisitedProfileColor(color);
       } catch (error) {
         this.userNotFound = true;
         return;
@@ -121,6 +166,11 @@ export default {
 
     revertView() {
       this.activeTab = 1;
+    },
+
+    initDisplayGameDetails(data) {
+      this.displayData = data;
+      this.showGameModal = true;
     }
   }
 };
@@ -203,13 +253,9 @@ export default {
       }
     }
 
-    .devider {
+    .divider {
       width: 4px;
-      background: linear-gradient(
-        180deg,
-        rgba(var(--accentColor)) 0%,
-        rgba(40, 53, 61, 0) 90%
-      );
+      background: v-bind(dividerColor);
     }
   }
 }

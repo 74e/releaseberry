@@ -49,7 +49,15 @@ export default {
   },
 
   getUserProfile(handle) {
-    return api.get(`user/${handle}`);
+    return api.get(`user/profile/${handle}`);
+  },
+
+  getUserFeed() {
+    return api.get('user/feed');
+  },
+
+  getLeaderboardData() {
+    return api.get('user/leaderboard');
   },
 
   followUser(userId) {

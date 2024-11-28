@@ -21,7 +21,7 @@
                 :class="[
                   'item',
                   {
-                    selected: selectedGameItem?.appid === game.appid,
+                    selected: selectedGameItem?.id === game.id,
                     following: game.isFollowedByUser
                   }
                 ]"
@@ -32,10 +32,7 @@
                 <span>{{ game.name }}</span>
                 <div
                   v-if="game.isFollowedByUser"
-                  :class="[
-                    'following',
-                    { notice: isAlreadyInLibraryAppid === game.appid }
-                  ]"
+                  :class="['following', { notice: isAlreadyInLibraryId === game.id }]"
                 >
                   <FollowedCheckmarkIcon />
                 </div>
@@ -86,7 +83,7 @@ export default {
       openTab: 1,
       searchQuery: '',
       isLoading: false,
-      isAlreadyInLibraryAppid: null,
+      isAlreadyInLibraryId: null,
       isAlreadyInLibraryTimeout: null
     };
   },
@@ -139,10 +136,10 @@ export default {
       if (game?.isFollowedByUser) {
         clearTimeout(this.isAlreadyInLibraryTimeout);
 
-        this.isAlreadyInLibraryAppid = game.appid;
+        this.isAlreadyInLibraryId = game.id;
 
         this.isAlreadyInLibraryTimeout = setTimeout(() => {
-          this.isAlreadyInLibraryAppid = null;
+          this.isAlreadyInLibraryId = null;
         }, 1500);
 
         return;
