@@ -35,6 +35,8 @@ export default {
   justify-content: center;
   gap: 40px;
   width: 100%;
+  max-width: 1300px;
+  margin: auto;
   position: relative;
   padding: 4px;
   overflow: hidden;

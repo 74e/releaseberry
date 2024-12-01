@@ -52,7 +52,7 @@ export default {
   background: linear-gradient(
     -20deg,
     rgba(var(--accentColor), 0.24) 0%,
-    rgb(34, 34, 34) 50%,
+    rgba(0, 0, 0, 0) 50%,
     rgba(var(--accentColor), 0.24) 100%
   );
   transition: all 0.3s ease-out;

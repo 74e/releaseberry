@@ -172,9 +172,9 @@ const userStore = defineStore('User', {
       }
     },
 
-    async getLeaderboardData() {
+    async getLeaderboardData(filter) {
       try {
-        const { data } = await userService.getLeaderboardData();
+        const { data } = await userService.getLeaderboardData(filter);
         return data;
       } catch (error) {
         console.error(error);

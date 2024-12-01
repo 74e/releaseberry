@@ -22,8 +22,6 @@ const nameAndCountry = computed(() => (props.margin == 's' ? '20px' : '40px'));
   align-items: center;
   justify-content: center;
 
-  animation: waveAnim forwards 6s infinite;
-  animation-timing-function: ease-in-out;
   cursor: default;
   user-select: none;
 
@@ -36,8 +34,8 @@ const nameAndCountry = computed(() => (props.margin == 's' ? '20px' : '40px'));
     background-clip: text;
     color: transparent;
 
-    animation: waveAnim forwards 6s infinite;
-    animation-timing-function: ease-in-out;
+    /* animation: waveAnim forwards 6s infinite; */
+    /* animation-timing-function: ease-in-out; */
   }
 
   .releaseberry-icon {
@@ -66,23 +64,6 @@ const nameAndCountry = computed(() => (props.margin == 's' ? '20px' : '40px'));
     .releaseberry-logo {
       font-size: 28px;
     }
-  }
-}
-
-@keyframes waveAnim {
-  0%,
-  100% {
-    filter: brightness(1);
-    text-shadow:
-      0 0 70px rgba(var(--accentColor), 0.4),
-      0 0 70px rgba(var(--accentColor), 0.4);
-  }
-
-  50% {
-    filter: brightness(1.2);
-    text-shadow:
-      0 0 80px rgba(var(--accentColor), 0.8),
-      0 0 80px rgba(var(--accentColor), 0.8);
   }
 }
 </style>

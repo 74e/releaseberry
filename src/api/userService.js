@@ -56,8 +56,10 @@ export default {
     return api.get('user/feed');
   },
 
-  getLeaderboardData() {
-    return api.get('user/leaderboard');
+  getLeaderboardData(filter) {
+    return api.get('user/leaderboard', {
+      params: { ...filter }
+    });
   },
 
   followUser(userId) {
