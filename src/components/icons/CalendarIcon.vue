@@ -1,6 +1,6 @@
 <template>
   <svg
-    class="calender-icon fill"
+    class="calendar-icon fill"
     width="21"
     height="22"
     viewBox="0 0 21 22"

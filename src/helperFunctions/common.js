@@ -7,12 +7,19 @@ function camelCaseToWords(camelCaseString) {
 function LoadImageInitTrigger(url, obj) {
   const img = new Image();
 
-  img.onload = function () {
-    obj.trigger = true;
-  };
+  img.onload = () => (obj.trigger = true);
 
   // Adding url after incase the img is small and loads before onload is initialized
   img.src = url;
+}
+
+function LoadImagePromise(url) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => resolve(true);
+    img.onerror = () => resolve(false);
+    img.src = url;
+  });
 }
 
 function validateImageUrl(url) {
@@ -44,4 +51,4 @@ function validateImageUrl(url) {
   });
 }
 
-export { camelCaseToWords, LoadImageInitTrigger, validateImageUrl };
+export { camelCaseToWords, LoadImageInitTrigger, validateImageUrl, LoadImagePromise };

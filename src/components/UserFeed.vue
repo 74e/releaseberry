@@ -38,10 +38,6 @@ export default {
 
     twoDayInMs() {
       return this.oneDayInMs * 2;
-    },
-
-    yearInMs() {
-      return this.oneDayInMs * 365;
     }
   },
 
@@ -64,8 +60,8 @@ export default {
       if (pastedTime < this.oneDayInMs) return `today`;
       if (pastedTime < this.twoDayInMs) return `yesterday`;
       const { day, month, year } = this.convertToDate(postDate);
-      if (pastedTime > this.yearInMs) return `${day} ${month} ${year}`;
-      return `${month} ${day}`;
+      if (year !== now.getFullYear()) return `${day} ${month} ${year}`;
+      return `${day} ${month}`;
     }
   }
 };

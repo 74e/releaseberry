@@ -98,15 +98,10 @@ const userStore = defineStore('User', {
     },
 
     async login({ userHandleOrEmail, password }) {
-      try {
-        const { data } = await userService.login(userHandleOrEmail, password);
-        const { user, token } = data;
+      const { data } = await userService.login(userHandleOrEmail, password);
+      const { user, token } = data;
 
-        await this.initUserData(user, token);
-      } catch (error) {
-        console.error(error);
-        throw error;
-      }
+      await this.initUserData(user, token);
     },
 
     logout() {

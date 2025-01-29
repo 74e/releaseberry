@@ -13,14 +13,14 @@
 <script>
 import GlobalLibraryArea from '@/components/GlobalLibraryArea.vue';
 import LeaderboardArea from '@/components/LeaderboardArea.vue';
-import CalenderArea from '@/components/CalenderArea.vue';
+import CalendarArea from '@/components/CalendarArea.vue';
 import TitleLogo from '@/components/TitleLogo.vue';
 import ViewMenu from '@/components/ViewMenu.vue';
 
 export default {
   name: 'ReleaseBerryCenter',
 
-  components: { GlobalLibraryArea, LeaderboardArea, CalenderArea, TitleLogo, ViewMenu },
+  components: { GlobalLibraryArea, LeaderboardArea, CalendarArea, TitleLogo, ViewMenu },
 
   data() {
     return {

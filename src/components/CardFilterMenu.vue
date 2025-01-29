@@ -1,93 +1,83 @@
 <template>
   <div class="menu-container">
-    <span class="order-by-heading">Filter by Release status</span>
+    <span class="order-by-heading">Filter by Card Type</span>
     <ul class="status-selection">
+      <li :class="selectedCard === null && 'active'" @click="selectCard(null)">
+        All cards <span class="muted">(default)</span>
+      </li>
       <li
-        v-for="status in availableReleaseStatus"
-        :class="status === currentStatus && 'active'"
-        @click="setReleaseStatus(status)"
-        :key="status"
+        :class="card.card_component === selectedCard && 'active'"
+        @click="selectCard(card.card_component)"
+        v-for="card in cardTypes"
+        :key="card.card_component"
       >
-        {{ status }}
+        {{ card.card_name }}
       </li>
     </ul>
 
     <span class="order-by-heading">Order by:</span>
     <div class="filter-section">
       <div
-        @click="setFilterOption(null)"
-        :class="['order-by-item', { active: currentOptions == null }]"
+        v-for="option in availableOptions"
+        :key="option"
+        @click="setFilterOption(option.order)"
+        :class="['order-by-item', { active: cardFilterOptions.order == option.order }]"
       >
-        <span>Custom order</span>
-      </div>
-
-      <div
-        @click="setFilterOption('releaseDate')"
-        :class="['order-by-item', { active: currentOptions == 'releaseDate' }]"
-      >
-        <span>Release date</span>
-
-        <div class="order">
-          <span
-            @click="(e) => setOrder('asc', e)"
-            :class="'asc' === currentOrder && 'active'"
-          >
-            asc
-          </span>
-          <span
-            @click="(e) => setOrder('desc', e)"
-            :class="'desc' === currentOrder && 'active'"
-          >
-            desc
-          </span>
-        </div>
+        <span>{{ option.label }}</span>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import gameStore from '../state/gameStore';
+import cardStore from '@/state/cardStore';
 import { mapState } from 'pinia';
 
 export default {
-  name: 'LibraryFilterMenu',
+  name: 'CardFilterMenu',
 
   inject: ['hide'],
 
   data() {
     return {
-      availableReleaseStatus: ['all', 'unreleased', 'released', 'collected', 'TBD']
+      availableOptions: [
+        { label: 'Newest Added', order: 'desc' },
+        { label: 'Oldest Added', order: 'asc' }
+      ]
     };
   },
 
   computed: {
-    ...mapState(gameStore, ['filterLibraryOptions']),
-    currentStatus() {
-      return this.filterLibraryOptions.status;
+    ...mapState(cardStore, ['cardConfigs', 'cardFilterOptions']),
+
+    cardTypes() {
+      if (!this.cardConfigs) return [];
+
+      return this.cardConfigs.map((c) => ({
+        card_component: c.card_component,
+        card_name: c.card_name
+      }));
     },
-    currentOptions() {
-      return this.filterLibraryOptions.option;
-    },
-    currentOrder() {
-      return this.filterLibraryOptions.order;
+
+    selectedCard() {
+      return this.cardFilterOptions.selectedCard;
     }
   },
 
+  mounted() {
+    console.log(this.cardConfigs);
+  },
+
   methods: {
-    setReleaseStatus(status) {
-      this.filterLibraryOptions.status = status;
+    selectCard(card) {
+      cardStore().cardFilterOptions.selectedCard = card;
+      this.$emit('getCardConfigsByGame');
       this.hide();
     },
 
-    setFilterOption(option) {
-      this.filterLibraryOptions.option = option;
-      this.hide();
-    },
-
-    setOrder(order, e) {
-      e.stopPropagation();
-      this.filterLibraryOptions.order = order;
+    setFilterOption(order) {
+      cardStore().cardFilterOptions.order = order;
+      this.$emit('getCardConfigsByGame');
       this.hide();
     }
   }
@@ -96,6 +86,7 @@ export default {
 
 <style scoped>
 .menu-container {
+  width: 230px;
   padding: 8px;
   display: flex;
   flex-direction: column;
@@ -106,12 +97,12 @@ export default {
 .status-selection {
   list-style: none;
   display: flex;
-  width: max-content;
+  flex-direction: column;
+  width: 100%;
   border: 1px solid rgba(255, 255, 255, 0.041);
   background-color: rgba(184, 184, 184, 0.048);
   border-radius: 8px;
   overflow: hidden;
-  margin: auto;
   user-select: none;
 
   li {
@@ -121,11 +112,31 @@ export default {
     font-size: 15px;
     cursor: pointer;
     text-transform: capitalize;
+    position: relative;
+
+    span {
+      color: rgba(255, 255, 255, 0.225);
+    }
 
     &.active,
     &:hover {
       background-color: rgba(184, 184, 184, 0.089);
       color: rgba(255, 255, 255, 0.644);
+    }
+
+    &.active {
+      &::after {
+        content: '';
+        background-color: rgba(var(--accentColor));
+        display: block;
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 3px;
+        height: 16px;
+        border-radius: 2px;
+      }
     }
   }
 }
@@ -135,7 +146,6 @@ export default {
   color: rgba(255, 255, 255, 0.274);
   margin-top: 2px;
 }
-
 .filter-section {
   display: grid;
   gap: 6px;

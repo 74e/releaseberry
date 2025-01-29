@@ -1,6 +1,12 @@
 import { api } from './api';
 
 export default {
+  getCardConfigsByGame(filter) {
+    return api.get(`card/configs-by-game`, {
+      params: filter
+    });
+  },
+
   addCardConfig(cardConfigId) {
     return api.post(`card/${cardConfigId}/add`);
   },

@@ -16,7 +16,9 @@ const gameStore = defineStore('Game', {
     activeGameListId: null,
     editingGameListId: null,
     filterLibraryOptions: { status: 'all', option: null, order: 'asc' },
-    filterSearchTerm: ''
+    filterSearchTerm: '',
+    globalFilterLibraryOptions: { status: 'all', option: 'Latest Added', order: 'asc' },
+    globalFilterSearchTerm: ''
   }),
 
   getters: {
@@ -84,10 +86,24 @@ const gameStore = defineStore('Game', {
 
     async getGlobalLibrary() {
       try {
-        const { data } = await gameService.getGlobalLibrary();
+        const { data } = await gameService.getGlobalLibrary({
+          globalFilterSearchTerm: this.globalFilterSearchTerm,
+          ...this.globalFilterLibraryOptions
+        });
         this.globalGames = data;
       } catch (error) {
         console.error(error);
+      }
+    },
+
+    async indexSearchAutoCompletion(searchTerm) {
+      try {
+        const { data } = await gameService.indexSearchAutoCompletion(searchTerm);
+
+        return data;
+      } catch (error) {
+        console.error(error);
+        throw error;
       }
     },
 
@@ -421,6 +437,16 @@ const gameStore = defineStore('Game', {
           return 'rd';
         default:
           return 'th';
+      }
+    },
+
+    async getGameCalendar() {
+      try {
+        const { data } = await gameService.getGameCalendar();
+        return data;
+      } catch (error) {
+        console.error(error);
+        throw error;
       }
     }
   }

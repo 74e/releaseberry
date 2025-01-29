@@ -2,11 +2,16 @@ import { defineStore } from 'pinia';
 import userStore from './userStore';
 import gameStore from './gameStore';
 import cardService from '@/api/cardService';
-import { toRaw } from 'vue';
+import _ from 'lodash';
 
 const cardStore = defineStore('Card', {
   state: () => ({
-    cardConfigs: null
+    cardConfigs: null,
+    cardFilterOptions: {
+      selectedGameId: null,
+      selectedCard: null,
+      order: 'desc'
+    }
   }),
 
   getters: {
@@ -14,8 +19,23 @@ const cardStore = defineStore('Card', {
   },
 
   actions: {
+    async getCardConfigsByGame() {
+      try {
+        const { data } = await cardService.getCardConfigsByGame(this.cardFilterOptions);
+
+        gameStore().globalGames = data;
+      } catch (error) {
+        console.error(error);
+        throw error;
+      }
+    },
+
+    setSelectedGameId(game) {
+      this.cardFilterOptions.selectedGameId = game;
+    },
+
     getConfigCopy() {
-      return structuredClone(toRaw(this.cardConfigs));
+      return _.cloneDeep(this.cardConfigs);
     },
 
     updateGameStore(callback) {

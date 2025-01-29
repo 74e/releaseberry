@@ -22,7 +22,7 @@ export default {
       buttons: [
         { component: 'LeaderboardArea', label: 'Leaderboard' },
         { component: 'GlobalLibraryArea', label: 'Global library' },
-        { component: 'CalenderArea', label: 'Games Calender' }
+        { component: 'CalendarArea', label: 'Games Calendar' }
       ]
     };
   }

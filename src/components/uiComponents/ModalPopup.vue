@@ -4,7 +4,15 @@
     @close="hide"
     :class="['modal-background', blur ? 'blur' : 'tint-background']"
   >
-    <div ref="window" class="window" :style="[borderStyle]">
+    <div v-if="exteriorcloseButton" @click="hide()" class="exterior-close-button">
+      <CloseIcon />
+    </div>
+
+    <div
+      ref="window"
+      :class="['modal', isCustomModal ? 'custom' : 'default']"
+      :style="[borderStyle]"
+    >
       <div v-if="closeButton" @click="hide()" class="close-button">
         <CloseIcon />
       </div>
@@ -30,9 +38,19 @@ export default {
       default: true
     },
 
+    isCustomModal: {
+      type: Boolean,
+      default: false
+    },
+
     closeButton: {
       type: Boolean,
       default: true
+    },
+
+    exteriorcloseButton: {
+      type: Boolean,
+      default: false
     },
 
     width: {
@@ -90,13 +108,6 @@ export default {
     };
   },
 
-  data() {
-    return {
-      hideTimer: null,
-      showTimer: null
-    };
-  },
-
   mounted() {
     document.addEventListener('keydown', this.handleEscape);
     document.body.style.overflow = 'hidden';
@@ -106,17 +117,6 @@ export default {
     document.removeEventListener('keydown', this.handleEscape);
     document.body.style.overflow = 'visible';
   },
-
-  // This does not work anymore since the modal only loads when it shows up
-  // watch: {
-  //   showModal() {
-  //     if (this.showModal) {
-  //       document.body.style.overflow = 'hidden';
-  //     } else {
-  //       document.body.style.overflow = 'visible';
-  //     }
-  //   }
-  // },
 
   computed: {
     borderStyle() {
@@ -175,19 +175,26 @@ export default {
   inset: 0;
 }
 
-.window {
-  width: v-bind(width);
-  background-color: var(--dark-85);
-  box-shadow: var(--shadow-default);
-  border-radius: v-bind(radiusStyle);
-
+.modal {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
 }
 
-.close-button {
+.default {
+  width: v-bind(width);
+  background-color: var(--dark-85);
+  box-shadow: var(--shadow-default);
+  border-radius: v-bind(radiusStyle);
+}
+
+.custom {
+  width: v-bind(width);
+}
+
+.close-button,
+.exterior-close-button {
   position: absolute;
   top: 0;
   right: 0;
@@ -201,12 +208,24 @@ export default {
   }
 }
 
+.exterior-close-button {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  top: 8px;
+  right: 8px;
+}
+
 .blur {
   backdrop-filter: blur(50px);
 }
 
 .tint-background {
-  background-color: rgba(0, 0, 0, 0.4);
+  background-color: rgba(0, 0, 0, 0.65);
 }
 
 .fade-enter-from,

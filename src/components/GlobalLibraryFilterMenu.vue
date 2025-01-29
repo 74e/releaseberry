@@ -4,7 +4,7 @@
     <ul class="status-selection">
       <li
         v-for="status in availableReleaseStatus"
-        :class="status === currentStatus && 'active'"
+        :class="status === filterOptions.status && 'active'"
         @click="setReleaseStatus(status)"
         :key="status"
       >
@@ -13,32 +13,24 @@
     </ul>
 
     <span class="order-by-heading">Order by:</span>
+
     <div class="filter-section">
       <div
-        @click="setFilterOption(null)"
-        :class="['order-by-item', { active: currentOptions == null }]"
+        v-for="option in availableOptions"
+        :key="option"
+        @click="setFilterOption(option)"
+        :class="['order-by-item', { active: filterOptions.option == option }]"
       >
-        <span>Custom order</span>
-      </div>
+        <span>{{ option }}</span>
 
-      <div
-        @click="setFilterOption('releaseDate')"
-        :class="['order-by-item', { active: currentOptions == 'releaseDate' }]"
-      >
-        <span>Release date</span>
-
-        <div class="order">
+        <div v-if="filterOptions.option == option" class="order">
           <span
-            @click="(e) => setOrder('asc', e)"
-            :class="'asc' === currentOrder && 'active'"
+            v-for="order in ['asc', 'desc']"
+            :key="order"
+            @click="(e) => setOrder(order, e)"
+            :class="order === filterOptions.order && 'active'"
           >
-            asc
-          </span>
-          <span
-            @click="(e) => setOrder('desc', e)"
-            :class="'desc' === currentOrder && 'active'"
-          >
-            desc
+            {{ order }}
           </span>
         </div>
       </div>
@@ -48,46 +40,45 @@
 
 <script>
 import gameStore from '../state/gameStore';
-import { mapState } from 'pinia';
 
 export default {
-  name: 'LibraryFilterMenu',
+  name: 'GlobalLibraryFilterMenu',
 
   inject: ['hide'],
 
   data() {
     return {
-      availableReleaseStatus: ['all', 'unreleased', 'released', 'collected', 'TBD']
+      availableReleaseStatus: ['all', 'unreleased', 'released'],
+      availableOptions: ['Latest Added', 'Release Date', 'Most Popular', 'Most Collected']
     };
   },
 
   computed: {
-    ...mapState(gameStore, ['filterLibraryOptions']),
-    currentStatus() {
-      return this.filterLibraryOptions.status;
-    },
-    currentOptions() {
-      return this.filterLibraryOptions.option;
-    },
-    currentOrder() {
-      return this.filterLibraryOptions.order;
+    filterOptions() {
+      return gameStore().globalFilterLibraryOptions;
     }
   },
 
   methods: {
     setReleaseStatus(status) {
-      this.filterLibraryOptions.status = status;
-      this.hide();
+      this.filterOptions.status = status;
+      this.getFilteredGames();
     },
 
     setFilterOption(option) {
-      this.filterLibraryOptions.option = option;
-      this.hide();
+      this.filterOptions.option = option;
+      this.filterOptions.order = 'asc';
+      this.getFilteredGames();
     },
 
     setOrder(order, e) {
       e.stopPropagation();
-      this.filterLibraryOptions.order = order;
+      this.filterOptions.order = order;
+      this.getFilteredGames();
+    },
+
+    getFilteredGames() {
+      this.$emit('getGlobalGames');
       this.hide();
     }
   }

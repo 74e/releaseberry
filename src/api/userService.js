@@ -58,7 +58,7 @@ export default {
 
   getLeaderboardData(filter) {
     return api.get('user/leaderboard', {
-      params: { ...filter }
+      params: filter
     });
   },
 

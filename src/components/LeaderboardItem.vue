@@ -57,7 +57,6 @@ export default {
 
   methods: {
     toggleAllInfo() {
-      console.log('opened');
       this.isOpen = !this.isOpen;
     }
   },
@@ -104,6 +103,7 @@ export default {
 }
 
 .placement {
+  min-width: 47px;
   font-size: 40px;
   padding: 0 16px 0 8px;
   color: v-bind(accentColor);

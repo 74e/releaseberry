@@ -222,10 +222,6 @@ export default {
     stringifyRGBA(colorValues) {
       const [R, G, B, A] = colorValues;
       return `rgba(${R},${G},${B},${A})`;
-    },
-
-    onloadShow() {
-      this.isLoaded = true;
     }
   }
 };

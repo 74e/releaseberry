@@ -32,6 +32,16 @@ import CooldownIcon from './CooldownIcon.vue';
 import NodeIcon from './NodeIcon.vue';
 import EditIcon from './EditIcon.vue';
 import LockedIcon from './LockedIcon.vue';
+import SwitchIcon from './SwitchIcon.vue';
+import PlaystationIcon from './PlaystationIcon.vue';
+import WindowsIcon from './WindowsIcon.vue';
+import SteamDeckIcon from './SteamDeckIcon.vue';
+import XboxIcon from './XboxIcon.vue';
+import AndroidIcon from './AndroidIcon.vue';
+import iOSIcon from './iOSIcon.vue';
+import LinuxIcon from './LinuxIcon.vue';
+import VRIcon from './VRIcon.vue';
+import MacIcon from './MacIcon.vue';
 
 export default {
   CalendarIcon,
@@ -67,5 +77,15 @@ export default {
   CooldownIcon,
   NodeIcon,
   EditIcon,
-  LockedIcon
+  LockedIcon,
+  SwitchIcon,
+  PlaystationIcon,
+  WindowsIcon,
+  SteamDeckIcon,
+  XboxIcon,
+  AndroidIcon,
+  iOSIcon,
+  LinuxIcon,
+  VRIcon,
+  MacIcon
 };

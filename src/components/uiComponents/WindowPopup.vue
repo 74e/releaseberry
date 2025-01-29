@@ -272,12 +272,11 @@ export default {
   transition: all 0.5s ease-out;
   backdrop-filter: blur(80px);
   z-index: 999;
+  position: absolute;
 
   @supports (backdrop-filter: blur(80px)) {
     background-color: var(--dark-95);
   }
-
-  position: absolute;
 }
 
 .fade-enter-from,

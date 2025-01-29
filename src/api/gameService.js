@@ -9,12 +9,20 @@ export default {
     return api.get('game/get-index');
   },
 
-  getGlobalLibrary() {
-    return api.get('game/library/global');
+  getGlobalLibrary(filter) {
+    return api.get('game/library/global', {
+      params: filter
+    });
   },
 
   getFollowedGamesFromUser(userId) {
     return api.get(`game/library/${userId}`);
+  },
+
+  indexSearchAutoCompletion(query) {
+    return api.get(`game/search-suggestion-index/`, {
+      params: { query }
+    });
   },
 
   getAvailableGames(query) {
@@ -98,5 +106,9 @@ export default {
     return api.put(`game/${customGameConfigId}/update-cover`, {
       coverData
     });
+  },
+
+  getGameCalendar() {
+    return api.get(`calendar/`);
   }
 };

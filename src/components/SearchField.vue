@@ -15,6 +15,12 @@
 export default {
   name: 'SearchField',
 
+  props: {
+    timeoutDelay: {
+      default: 500
+    }
+  },
+
   data() {
     return {
       searchQuery: '',
@@ -27,12 +33,16 @@ export default {
   },
 
   methods: {
+    changeQuery(query = '') {
+      this.searchQuery = query;
+    },
+
     handleSearch() {
       clearTimeout(this.searchTimeout);
 
       this.searchTimeout = setTimeout(() => {
         this.$emit('search', this.searchQuery);
-      }, 500);
+      }, this.timeoutDelay);
     }
   }
 };
@@ -46,7 +56,6 @@ export default {
   backdrop-filter: blur(80px);
   height: 50px;
   width: 320px;
-  margin: 26px auto 0 auto;
 
   padding: 0 12px 0 16px;
   display: flex;

@@ -77,8 +77,9 @@ export default {
     },
 
     selectRankByStat(stat){
-      this.rankBy = stat
       this.isOpen = false
+      if(this.rankBy == stat) return
+      this.rankBy = stat
       this.getLeaderboardData()
     },
 
@@ -91,7 +92,7 @@ export default {
 
 <style scoped>
 .leaderboard-container {
-  padding: 16px 0;
+  padding: 26px 0;
 }
 
 .leaderboard-list {
@@ -117,7 +118,7 @@ export default {
 }
 
 .focused-stat-filter {
-  margin: 0 auto 16px auto;
+  margin: 0 auto 26px auto;
   position: relative;
   width: max-content;
 
@@ -159,6 +160,8 @@ export default {
   flex-direction: column-reverse;
   padding: 0 8px;
   margin-top: 0;
+  position: absolute;
+  z-index: 1;
 }
 
 .dropdown.active {
