@@ -125,6 +125,7 @@ export default {
   overflow-y: scroll;
 
   .btn-container {
+    margin-top: auto;
     width: 100%;
     margin-top: 12px;
     display: flex;

@@ -23,8 +23,6 @@
         :clickOutside="true"
       />
     </TransitionGroup>
-
-    <DisplayAllIcons />
   </main>
 </template>
 

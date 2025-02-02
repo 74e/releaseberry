@@ -180,6 +180,8 @@ export default {
           this.isLoading = false;
         }
       }
+
+      console.log('2nd ping');
     }
   }
 };

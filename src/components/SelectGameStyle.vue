@@ -322,6 +322,7 @@ export default {
 }
 
 .select-card-container {
+  margin: auto;
   width: 600px;
   padding: 16px;
   align-content: center;
