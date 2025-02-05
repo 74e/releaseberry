@@ -30,6 +30,10 @@ const userStore = defineStore('User', {
       await achievementStore().getUserAchievements();
     },
 
+    clearUserProfile() {
+      this.userProfile = null;
+    },
+
     async handleTakenValidation(handle) {
       try {
         await userService.handleTakenValidation(handle);

@@ -133,7 +133,7 @@ export default {
   },
 
   methods: {
-    ...mapActions(userStore, ['getUserProfile']),
+    ...mapActions(userStore, ['getUserProfile', 'clearUserProfile']),
 
     setActiveTab(tab) {
       this.activeTab = tab;
@@ -142,6 +142,7 @@ export default {
     async initiateGetUserData() {
       this.isUsersOwnPage = false;
       this.userNotFound = false;
+      this.clearUserProfile();
 
       const { handle } = this.$route.params;
 
