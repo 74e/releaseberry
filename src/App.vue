@@ -1,19 +1,22 @@
 <template>
   <div class="page-container">
-    <router-view v-slot="{ Component }">
+    <RouterView v-slot="{ Component }">
       <transition name="fade" mode="out-in">
         <component v-if="authInitiated" :is="Component" />
       </transition>
-    </router-view>
+    </RouterView>
     <NavbarMenu />
   </div>
 
   <ToasterComponent />
   <ProfileImagePreloader />
-  <div class="temporaryBG" />
+  <InitializationLoadingScreen :showLoadingScreen="!authInitiated" />
+  <BackgroundDisplay />
 </template>
 
 <script>
+import InitializationLoadingScreen from './components/InitializationLoadingScreen.vue';
+import BackgroundDisplay from './components/BackgroundDisplay.vue';
 import colorStore from './state/colorStore';
 import userStore from './state/userStore';
 import { toastStore } from './state/toastStore';
@@ -26,10 +29,12 @@ import cc from './helperFunctions/color';
 
 export default {
   components: {
+    InitializationLoadingScreen,
     RouterView,
     NavbarMenu,
     ToasterComponent,
-    ProfileImagePreloader
+    ProfileImagePreloader,
+    BackgroundDisplay
   },
 
   data() {
@@ -76,10 +81,12 @@ export default {
             icon: 'ProfileIcon',
             message: `Welcome back ${username}`
           });
+
+          this.$router.push('/library');
         } catch (error) {
           toastStore().handleErrorMessage(error, `Something went wrong, couldn't login`);
           this.logout();
-          this.$router.push('/main');
+          this.$router.push('/');
         }
       }
 
@@ -129,21 +136,5 @@ svg {
 
 .accent-text {
   color: rgba(var(--accentColor));
-}
-
-.temporaryBG {
-  position: fixed;
-  inset: 0;
-  background-image: url('/fakeEffect.png');
-  background-size: cover;
-  mix-blend-mode: lighten;
-
-  z-index: -20;
-}
-
-.test-extend {
-  background-color: purple;
-  padding: 8px;
-  border: 1px solid blue;
 }
 </style>

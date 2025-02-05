@@ -24,7 +24,7 @@
         </template>
       </WindowPopup>
 
-      <div class="search-field">
+      <div class="search-field-container">
         <SearchField ref="search" :timeoutDelay="250" @search="handleSearch" />
         <ul class="dropdown" v-if="isValidSearch">
           <li
@@ -157,6 +157,7 @@ export default {
 
     async handleSearch(query) {
       this.isValidSearch = Boolean(query);
+      if (!this.isValidSearch) return;
 
       if (this.searchType === 'game') {
         gameStore().$patch({ globalFilterSearchTerm: query });

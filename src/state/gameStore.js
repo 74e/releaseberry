@@ -25,7 +25,7 @@ const gameStore = defineStore('Game', {
     library: (state) => {
       if (state.activeGameListId) {
         const activeGameLists =
-          state.userGameLists.find(({ id }) => id === state.activeGameListId)
+          state.gameLists.find(({ id }) => id === state.activeGameListId)
             ?.game_list_items || [];
 
         return state.ownGames.filter(({ cardData: { game_followed_id } }) => {
