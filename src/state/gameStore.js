@@ -414,7 +414,7 @@ const gameStore = defineStore('Game', {
       let date = new Date(Number(time));
       let day = date.getDate();
       let isInvalid = false;
-      const month = date.toLocaleString('default', { month: 'long' });
+      const month = date.toLocaleString('en-US', { month: 'long' });
       const year = date.getFullYear();
       day = day += this.getNumberSuffix(day);
 

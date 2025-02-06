@@ -160,7 +160,7 @@ export default {
     days() {
       const days = Math.floor(this.diff / this.dayInMs);
 
-      return `${days} Day${days > 1 ? 's' : ''}`;
+      return `${days + 1} Day${days > 1 ? 's' : ''}`;
     },
 
     date() {
