@@ -64,10 +64,6 @@ export default {
     }
   },
 
-  mounted() {
-    console.log(this.cardConfigs);
-  },
-
   methods: {
     selectCard(card) {
       cardStore().cardFilterOptions.selectedCard = card;
