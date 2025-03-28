@@ -17,7 +17,7 @@ const gameStore = defineStore('Game', {
     editingGameListId: null,
     filterLibraryOptions: { status: 'all', option: null, order: 'asc' },
     filterSearchTerm: '',
-    globalFilterLibraryOptions: { status: 'all', option: 'Latest Added', order: 'asc' },
+    globalFilterLibraryOptions: { status: 'all', option: 'Latest Added', order: 'desc' },
     globalFilterSearchTerm: ''
   }),
 
@@ -48,6 +48,10 @@ const gameStore = defineStore('Game', {
   },
 
   actions: {
+    async serverPing() {
+      await gameService.serverPing();
+    },
+
     async syncSteamGameIndex() {
       try {
         const { data } = await gameService.syncSteamGameIndex();

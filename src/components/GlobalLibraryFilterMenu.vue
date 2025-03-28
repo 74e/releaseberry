@@ -49,7 +49,7 @@ export default {
   data() {
     return {
       availableReleaseStatus: ['all', 'unreleased', 'released'],
-      availableOptions: ['Latest Added', 'Release Date', 'Most Popular', 'Most Collected']
+      availableOptions: ['Latest Added', 'Release Date', 'Most Popular']
     };
   },
 
@@ -67,7 +67,7 @@ export default {
 
     setFilterOption(option) {
       this.filterOptions.option = option;
-      this.filterOptions.order = 'asc';
+      this.filterOptions.order = 'desc';
       this.getFilteredGames();
     },
 

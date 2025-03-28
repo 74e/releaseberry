@@ -1,6 +1,10 @@
 import { api } from './api';
 
 export default {
+  serverPing() {
+    return api.get('game/ping');
+  },
+
   syncSteamGameIndex() {
     return api.post('game/sync-index');
   },

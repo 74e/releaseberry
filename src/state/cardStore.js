@@ -34,6 +34,10 @@ const cardStore = defineStore('Card', {
       this.cardFilterOptions.selectedGameId = game;
     },
 
+    clearSelectedGameId() {
+      this.cardFilterOptions.selectedGameId = null;
+    },
+
     getConfigCopy() {
       return _.cloneDeep(this.cardConfigs);
     },

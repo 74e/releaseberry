@@ -19,6 +19,7 @@ import InitializationLoadingScreen from './components/InitializationLoadingScree
 import BackgroundDisplay from './components/BackgroundDisplay.vue';
 import colorStore from './state/colorStore';
 import userStore from './state/userStore';
+import gameStore from './state/gameStore';
 import { toastStore } from './state/toastStore';
 import { mapState, mapActions } from 'pinia';
 import { RouterView } from 'vue-router';
@@ -71,9 +72,11 @@ export default {
      */
 
     async initiateApp() {
-      const session = localStorage.getItem('RBsession');
-      if (session) {
-        try {
+      try {
+        await gameStore().serverPing();
+
+        const session = localStorage.getItem('RBsession');
+        if (session) {
           await this.persistentLogin();
           const { username } = userStore().loggedInUser;
 
@@ -82,12 +85,12 @@ export default {
             message: `Welcome back ${username}`
           });
 
-          this.$router.push('/library');
-        } catch (error) {
-          toastStore().handleErrorMessage(error, `Something went wrong, couldn't login`);
-          this.logout();
-          this.$router.push('/');
+          // this.$router.push('/library');
         }
+      } catch (error) {
+        toastStore().handleErrorMessage(error, `Something went wrong, couldn't login`);
+        this.logout();
+        this.$router.push('/');
       }
 
       this.authInitiated = true;

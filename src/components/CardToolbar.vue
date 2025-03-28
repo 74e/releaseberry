@@ -22,16 +22,16 @@
         </template>
       </WindowPopup>
 
-      <WindowPopup>
+      <!-- <WindowPopup>
         <LayoutIcon />
         <template #window>
           <div style="padding: 16px; width: 150px; text-align: center">
             Layout settings coming soon
           </div>
         </template>
-      </WindowPopup>
+      </WindowPopup> -->
 
-      <button @click="toggleAddGameModal" class="add-title-btn">
+      <button @click="$emit('toggleAddGameModal')" class="add-title-btn">
         <PlusIcon />
         Add
       </button>
@@ -42,9 +42,6 @@
     :showSearchField="showSearchField"
     @toggle-search-field="toggleSearchField"
   />
-  <Transition name="fade">
-    <AddGameModal v-if="showAddGameModal" v-model:showModal="showAddGameModal" />
-  </Transition>
 </template>
 
 <script>
@@ -57,6 +54,8 @@ import AddGameModal from './AddGameModal.vue';
 export default {
   name: 'CardToolbar',
 
+  emits: ['toggleAddGameModal'],
+
   components: {
     ToolBarSearchField,
     WindowPopup,
@@ -67,8 +66,7 @@ export default {
 
   data() {
     return {
-      showSearchField: false,
-      showAddGameModal: false
+      showSearchField: false
     };
   },
 
@@ -81,10 +79,6 @@ export default {
   methods: {
     toggleSearchField() {
       this.showSearchField = !this.showSearchField;
-    },
-
-    toggleAddGameModal() {
-      this.showAddGameModal = !this.showAddGameModal;
     }
   }
 };

@@ -94,7 +94,12 @@
                   <span>Add with custom style</span>
                 </ButtonComponent>
 
-                <ButtonComponent @click="addWithCurrentPreset" size="s" class="btn">
+                <ButtonComponent
+                  :disabled="isLoading"
+                  @click="addWithCurrentPreset"
+                  size="s"
+                  class="btn"
+                >
                   <SaveIcon />
                   <span>Add with current style</span>
                 </ButtonComponent>
@@ -178,6 +183,7 @@ export default {
       showFollowsModal: false,
       showQuickAddModal: false,
       showAdminConfirmationModal: false,
+      isLoading: false,
       mode: 'GameDetailsDisplay'
     };
   },
@@ -278,6 +284,9 @@ export default {
     },
 
     async addWithCurrentPreset() {
+      if (this.isLoading) return;
+      this.isLoading = true;
+
       try {
         await this.addGameAndCopyPreset({
           gameId: this.gameId,
@@ -294,6 +303,8 @@ export default {
           error,
           `Something went wrong, could not add game`
         );
+      } finally {
+        this.isLoading = false;
       }
     },
 

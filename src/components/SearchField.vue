@@ -5,7 +5,8 @@
       ref="searchField"
       v-model="searchQuery"
       @input="handleSearch"
-      placeholder="Search"
+      :placeholder="disabled ? '' : 'Search'"
+      :disabled="disabled"
     />
     <SearchIcon />
   </div>
@@ -18,6 +19,11 @@ export default {
   props: {
     timeoutDelay: {
       default: 500
+    },
+
+    disabled: {
+      type: Boolean,
+      default: false
     }
   },
 
@@ -55,7 +61,7 @@ export default {
   border-radius: var(--radius-l);
   backdrop-filter: blur(80px);
   height: 50px;
-  width: 320px;
+  width: 100%;
 
   padding: 0 12px 0 16px;
   display: flex;

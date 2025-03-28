@@ -1,7 +1,7 @@
 <template>
   <div class="root">
     <div class="filter-menu">
-      <WindowPopup ref="typebtn">
+      <WindowPopup ref="typebtn" position="bottom-right" class="type-btn">
         <div class="side-menu-icon">
           <ControllerIcon v-if="searchType == 'game'" />
           <ThemeIcon v-else />
@@ -25,21 +25,39 @@
       </WindowPopup>
 
       <div class="search-field-container">
-        <SearchField ref="search" :timeoutDelay="250" @search="handleSearch" />
-        <ul class="dropdown" v-if="isValidSearch">
-          <li
-            v-for="result in searchSuggestion"
-            :key="result.id"
-            @click="selectGameId(result)"
-          >
-            {{ result.name }}
-          </li>
-        </ul>
+        <SearchField
+          ref="search"
+          :disabled="Boolean(selectedGameId)"
+          :timeoutDelay="300"
+          @search="handleSearch"
+        />
+
+        <div v-if="gameTitleTag" class="tagged-game-tag">
+          <span>{{ gameTitleTag }}</span>
+          <div class="close-btn" @click="clearGameId"><CloseIcon /></div>
+        </div>
+
+        <Transition name="fade">
+          <ul v-if="globalFilterSearchTerm && searchType == 'card'" class="dropdown">
+            <li
+              v-for="result in searchSuggestion"
+              :key="result.id"
+              @click="selectGameId(result)"
+            >
+              {{ result.name }}
+            </li>
+
+            <li v-if="searchSuggestion == 0" class="no-suggestions-found">
+              No results found
+            </li>
+          </ul>
+        </Transition>
       </div>
 
-      <WindowPopup>
+      <WindowPopup class="filter-btn">
         <div class="side-menu-icon">
           <FilterIcon />
+          <span>Filter</span>
         </div>
         <template #window>
           <GlobalLibraryFilterMenu
@@ -52,12 +70,17 @@
           />
         </template>
       </WindowPopup>
+
+      <div class="side-menu-icon add-btn" @click="toggleAddGameModal">
+        <PlusIcon />
+        <span>Add</span>
+      </div>
     </div>
 
     <Transition name="fade">
       <div v-if="!isLoading" class="card-display-container">
         <component
-          v-for="card in globalLibrary"
+          v-for="card in filteredGlobalLibrary"
           :is="card.cardData?.card_component || 'FallbackCard'"
           :gameData="card.gameData"
           :cardData="card.cardData"
@@ -67,20 +90,32 @@
       </div>
     </Transition>
 
-    <Transition name="fade">
+    <NoResultsNotice
+      v-if="globalLibrary.length == 0 && !isLoading && globalFilterSearchTerm"
+      heading="No games found"
+      message="Looks like the game you're looking for hasn't been added to Release Berry yet. <br /> Be the first to add it!"
+      buttonMessage="Add game"
+      :callback="toggleAddGameModal"
+    />
+
+    <TransitionGroup name="fade">
       <GameDetailsModal
         v-if="showGameModal"
         v-model:showModal="showGameModal"
         :displayData="displayData"
         :clickOutside="true"
       />
-    </Transition>
+
+      <AddGameModal v-if="showAddGameModal" v-model:showModal="showAddGameModal" />
+    </TransitionGroup>
   </div>
 </template>
 
 <script>
 import SearchField from '@/components/SearchField.vue';
+import AddGameModal from './AddGameModal.vue';
 import GameDetailsModal from '@/components/GameDetailsModal.vue';
+import NoResultsNotice from './NoResultsNotice.vue';
 import TitleLogo from '@/components/TitleLogo.vue';
 import gameStore from '@/state/gameStore';
 import { mapState, mapActions } from 'pinia';
@@ -99,17 +134,20 @@ export default {
     GameDetailsModal,
     WindowPopup,
     GlobalLibraryFilterMenu,
-    CardFilterMenu
+    AddGameModal,
+    CardFilterMenu,
+    NoResultsNotice
   },
 
   data() {
     return {
       showGameModal: false,
+      showAddGameModal: false,
       displayData: null,
       searchType: 'game',
       isLoading: false,
       searchSuggestion: [],
-      isValidSearch: false
+      gameTitleTag: null
     };
   },
 
@@ -118,8 +156,40 @@ export default {
   },
 
   computed: {
-    ...mapState(gameStore, ['globalLibrary']),
-    ...mapState(cardStore, ['gamesByCardType'])
+    ...mapState(gameStore, [
+      'globalLibrary',
+      'globalFilterLibraryOptions',
+      'globalFilterSearchTerm'
+    ]),
+    ...mapState(cardStore, ['gamesByCardType']),
+
+    selectedGameId() {
+      return cardStore().cardFilterOptions.selectedGameId;
+    },
+
+    filteredGlobalLibrary() {
+      return this.globalLibrary.filter((game) => {
+        let status = this.globalFilterLibraryOptions.status;
+
+        if (status == 'all') return true;
+
+        const currentTIme = new Date().getTime();
+        const gameReleaseTime = parseInt(game.gameData.release_date);
+
+        if (
+          status == 'unreleased' &&
+          (gameReleaseTime > currentTIme || isNaN(gameReleaseTime))
+        ) {
+          return true;
+        }
+
+        if (status == 'released' && gameReleaseTime < currentTIme) {
+          return true;
+        }
+
+        return false;
+      });
+    }
   },
 
   watch: {
@@ -141,30 +211,51 @@ export default {
       this.showGameModal = true;
     },
 
+    toggleAddGameModal() {
+      this.showAddGameModal = !this.showAddGameModal;
+    },
+
+    resetSearchState() {
+      this.gameTitleTag = null;
+      this.searchSuggestion = [];
+      this.$refs.search.changeQuery('');
+      gameStore().$patch({ globalFilterSearchTerm: '' });
+      cardStore().clearSelectedGameId();
+    },
+
     switchSearchType(type) {
       if (type === this.searchType) return;
+      this.resetSearchState();
       this.searchType = type;
       this.$refs.typebtn.hide();
     },
 
     selectGameId(game) {
-      // TODO: after its been selected there is no way to remove it. make it so you can remove the game id fromt the search
+      this.searchSuggestion = [];
+      this.$refs.search.changeQuery('');
       cardStore().setSelectedGameId(game.id);
+      this.gameTitleTag = game.name;
       this.getDisplayData();
-      this.$refs.search.changeQuery(game.name);
-      this.isValidSearch = false;
+    },
+
+    clearGameId() {
+      this.gameTitleTag = null;
+      cardStore().clearSelectedGameId();
+      this.getDisplayData();
     },
 
     async handleSearch(query) {
-      this.isValidSearch = Boolean(query);
-      if (!this.isValidSearch) return;
-
-      if (this.searchType === 'game') {
+      try {
         gameStore().$patch({ globalFilterSearchTerm: query });
-        this.getDisplayData();
-      } else {
-        const data = await gameStore().indexSearchAutoCompletion(query);
-        this.searchSuggestion = data.sort((a, b) => a.name.length - b.name.length);
+        if (this.searchType === 'game') {
+          this.getDisplayData();
+        } else {
+          if (!query) return;
+          const data = await gameStore().indexSearchAutoCompletion(query);
+          this.searchSuggestion = data.sort((a, b) => a.name.length - b.name.length);
+        }
+      } catch (error) {
+        console.log(error);
       }
     },
 
@@ -254,11 +345,106 @@ export default {
   cursor: pointer;
   display: flex;
   max-height: 50px;
-
   align-items: center;
+  justify-content: center;
 
   &:hover {
     filter: brightness(1.3);
+  }
+
+  .plus-icon {
+    height: 20px;
+    width: 20px;
+  }
+}
+
+.filter-btn,
+.add-btn,
+.type-btn {
+  span {
+    display: none;
+  }
+}
+
+.search-field-container {
+  position: relative;
+
+  .tagged-game-tag {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    left: 8px;
+    display: flex;
+    align-items: center;
+    padding: 4px 8px;
+    text-wrap: wrap;
+    max-width: 230px;
+    background-color: rgba(255, 255, 255, 0.062);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease-out;
+    color: rgba(255, 255, 255, 0.521);
+  }
+
+  .dropdown {
+    position: absolute;
+    z-index: 1;
+    top: calc(100% + 8px);
+    left: 0;
+    right: 0;
+    background-color: var(--dark-50);
+    box-shadow: var(--shadow-default);
+    border-radius: var(--radius-l);
+    backdrop-filter: blur(10px);
+    color: rgba(var(--accentColor), 1);
+    padding: 16px;
+    list-style-type: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    li {
+      font-size: 14px;
+      padding: 8px 12px;
+      border-radius: 8px;
+      background-color: rgba(255, 255, 255, 0.062);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      cursor: pointer;
+      transition: all 0.3s ease-out;
+      color: rgba(255, 255, 255, 0.521);
+      user-select: none;
+
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.199);
+        border: 1px solid rgba(255, 255, 255, 0.158);
+      }
+    }
+  }
+}
+
+@media (max-width: 570px) {
+  .filter-menu {
+    display: grid;
+    grid-template-rows: repeat(2, 1fr);
+    grid-template-columns: repeat(3, 0.33fr);
+  }
+
+  .search-field-container {
+    grid-row-start: 2;
+    grid-column-start: 1;
+    grid-column-end: 4;
+  }
+
+  .filter-btn,
+  .add-btn,
+  .type-btn {
+    width: 100%;
+
+    span {
+      display: inline-block;
+      margin-left: 8px;
+    }
   }
 }
 </style>

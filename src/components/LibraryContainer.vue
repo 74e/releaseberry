@@ -14,17 +14,29 @@
       :draggable="true"
     />
   </TransitionGroup>
+
+  <NoResultsNotice
+    v-if="library.length == 0"
+    heading="No games found"
+    message="Looks like the game you're looking for isn't in the global library."
+    buttonMessage="Add game"
+    :callback="() => $emit('toggleAddGameModal')"
+  />
 </template>
 
 <script>
+import NoResultsNotice from './NoResultsNotice.vue';
 import gameStore from '@/state/gameStore';
 import { toastStore } from '@/state/toastStore';
 import { mapState, mapActions } from 'pinia';
+import ButtonComponent from './ButtonComponent.vue';
 
 export default {
   name: 'LibraryContainer',
 
-  emits: ['triggerGameModal'],
+  components: { ButtonComponent, NoResultsNotice },
+
+  emits: ['triggerGameModal', 'toggleAddGameModal'],
 
   data() {
     return {
@@ -190,6 +202,37 @@ export default {
 </script>
 
 <style scoped>
+.empty-library-notice {
+  width: 100%;
+  max-width: 430px;
+  padding: 32px;
+  margin: auto;
+  background-color: var(--dark-50);
+  box-shadow: var(--shadow-default);
+  border-radius: var(--radius-l);
+  backdrop-filter: blur(80px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+
+  h1 {
+    color: var(--accent);
+    font-size: 26px;
+  }
+
+  span {
+    font-size: 18px;
+    color: rgba(255, 255, 255, 0.555);
+    line-height: 25px;
+    text-align: center;
+  }
+
+  button {
+    margin-top: 8px;
+  }
+}
+
 .moving.moving.moving.moving {
   position: relative;
 

@@ -2,12 +2,17 @@
   <main>
     <TitleLogo />
     <template v-if="isUserLoggedIn">
-      <CardToolbar />
+      <CardToolbar @toggleAddGameModal="toggleAddGameModal" />
       <Transition name="fade">
         <CollectionContainer v-if="collectableGames.length > 0" />
       </Transition>
-      <LibraryContainer @triggerGameModal="triggerGameModal" />
+      <LibraryContainer
+        @triggerGameModal="triggerGameModal"
+        @toggleAddGameModal="toggleAddGameModal"
+      />
     </template>
+
+    <WelcomeReleaseBerry v-else />
 
     <TransitionGroup name="fade">
       <GameDetailsModal
@@ -22,6 +27,8 @@
         v-model:showModal="showGameListModal"
         :clickOutside="true"
       />
+
+      <AddGameModal v-if="showAddGameModal" v-model:showModal="showAddGameModal" />
     </TransitionGroup>
   </main>
 </template>
@@ -31,12 +38,13 @@ import CardToolbar from '@/components/CardToolbar.vue';
 import TitleLogo from '@/components/TitleLogo.vue';
 import GameDetailsModal from '@/components/GameDetailsModal.vue';
 import EditGameListModal from '@/components/EditGameListModal.vue';
+import AddGameModal from '@/components/AddGameModal.vue';
 import CollectionContainer from '@/components/CollectionContainer.vue';
 import LibraryContainer from '@/components/LibraryContainer.vue';
 import gameStore from '@/state/gameStore';
 import userStore from '@/state/userStore';
 import { mapState } from 'pinia';
-import DisplayAllIcons from '@/components/DisplayAllIcons.vue';
+import WelcomeReleaseBerry from '@/components/welcomeComponents/WelcomeReleaseBerry.vue';
 
 export default {
   name: 'MainView',
@@ -45,15 +53,17 @@ export default {
     CardToolbar,
     TitleLogo,
     GameDetailsModal,
-    DisplayAllIcons,
     EditGameListModal,
     LibraryContainer,
-    CollectionContainer
+    CollectionContainer,
+    WelcomeReleaseBerry,
+    AddGameModal
   },
 
   data() {
     return {
       showGameModal: false,
+      showAddGameModal: false,
       showGameListModal: false,
       displayData: null
     };
@@ -81,6 +91,10 @@ export default {
     triggerGameModal(data) {
       this.displayData = data;
       this.showGameModal = true;
+    },
+
+    toggleAddGameModal() {
+      this.showAddGameModal = !this.showAddGameModal;
     }
   }
 };
