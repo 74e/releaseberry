@@ -12,10 +12,6 @@
         <div class="sk-cube sk-cube7" />
         <div class="sk-cube sk-cube6" />
       </div>
-
-      <div v-if="showLoadingText" class="loading-text">
-        <span>{{ textContent }}</span>
-      </div>
     </div>
   </Transition>
 </template>
@@ -28,16 +24,6 @@ export default {
     isLoading: {
       type: Boolean,
       default: false
-    },
-
-    showLoadingText: {
-      type: Boolean,
-      default: true
-    },
-
-    textContent: {
-      type: String,
-      default: 'Loading'
     },
 
     cubeDimensions: {
@@ -69,16 +55,6 @@ export default {
   justify-content: center;
 
   background-color: rgba(0, 0, 0, 0.25);
-}
-
-.loading-text {
-  margin-top: 16px;
-  font-size: 18px;
-  padding-right: 20px;
-
-  span {
-    position: relative;
-  }
 }
 
 .sk-cube-grid {
